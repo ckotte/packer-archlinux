@@ -7,9 +7,6 @@ echo ">>>> install-virtualbox.sh: Installing VirtualBox Guest Additions and NFS 
 echo ">>>> install-virtualbox.sh: Enabling VirtualBox Guest service.."
 /usr/bin/systemctl enable vboxservice.service
 
-echo ">>>> install-virtualbox.sh: Enabling RPC Bind service.."
-/usr/bin/systemctl enable rpcbind.service
-
 # Add groups for VirtualBox folder sharing
 echo ">>>> install-virtualbox.sh: Enabling VirtualBox Shared Folders.."
 /usr/bin/usermod --append --groups vagrant,vboxsf vagrant
