@@ -1,6 +1,5 @@
 #!/usr/bin/bash -x
 
-# Open VM Tools
 # https://wiki.archlinux.org/index.php/VMware
 # https://wiki.archlinux.org/index.php/VMware/Installing_Arch_as_a_guest
 echo ">>>> install-virtualbox.sh: Installing Open-VM-Tools and NFS utilities.."
