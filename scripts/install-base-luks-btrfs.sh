@@ -496,9 +496,6 @@ echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sshd.."
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Creating vagrant user.."
 /usr/bin/groupadd -g 1234 vagrant
 /usr/bin/useradd --password ${PASSWORD} --comment 'Vagrant User' --create-home --uid 1234 --gid 1234 vagrant
-echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring vagrant cache btrfs volume.."
-/usr/bin/btrfs subvolume create /home/vagrant/.cache
-chown vagrant.vagrant /home/vagrant/.cache
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sudo.."
 echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10_vagrant
 echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_vagrant
