@@ -7,9 +7,8 @@
 # use a mirror from the provided country in order to build an Arch Linux box
 # using Packer.
 #
-# Copyright (c) 2015 Aaron Bull Schaefer <aaron@elasticdog.com>
-# This source code is provided under the terms of the ICS License
-# that can be be found in the LICENSE file.
+# Copyright (c) 2015-2018 Aaron Bull Schaefer <aaron@elasticdog.com>
+# Copyright (c) 2020 Christian Kotte <christian.kotte@gmx.de>
 #
 
 ##### Constants

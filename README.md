@@ -140,10 +140,5 @@ provisioning. My intention was to duplicate a DigitalOcean VPS and
 furthermore use the VM for testing [Ansible](http://www.ansible.com/)
 playbooks for configuration management.
 
-License
--------
 
-Packer Arch is provided under the terms of the
-[ISC License](https://en.wikipedia.org/wiki/ISC_license).
 
-Copyright &copy; 2013&#8211;2017, [Aaron Bull Schaefer](mailto:aaron@elasticdog.com).
