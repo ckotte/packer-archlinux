@@ -65,7 +65,7 @@ validate_country() {
 # print this script's usage message to stderr
 usage() {
   cat <<-EOF >&2
-  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-b BTRFS LAYOUT] [-g GRUB PASSPHRASE] [-o ON-ERROR ACTION] [-f] [-d] [-h] [template]
+  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-b BTRFS LAYOUT] [-l LUKS] [-g GRUB PASSPHRASE] [-o ON-ERROR ACTION] [-f] [-d] [-h] [template]
 EOF
 }
 
@@ -145,8 +145,12 @@ help() {
               the btrfs layout that should be used
               defaults to simple
 
+       -l, --luks=yes|no
+              encrypt the partitions with LUKS (Linux Unified Key Setup)
+              defaults to yes
+
        -g, --grub-passphrase=yes|no
-              required to enter a grub passphrase; a patched grub and the keyfile is used if set to no
+              required to enter a grub passphrase if using luks; a patched grub and the keyfile is used if set to no
               defaults to yes
 
        -o, --on-error=ACTION
@@ -192,6 +196,7 @@ dry_run=false
 timeout=''
 skip_write_zeros=false
 btrfs_layout='current'
+luks='yes'
 grub_passphrase='yes'
 on_error=''
 force=false
@@ -231,6 +236,13 @@ while [[ $1 != '' ]]; do
       ;;
     --btrfs-layout=*)
       btrfs_layout=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      ;;
+    -l | --luks)
+      luks=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      shift
+      ;;
+    --luks=*)
+      luks=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
       ;;
     -g | --grub-passphrase)
       grub_passphrase=$(echo "$2" | tr '[:lower:]' '[:upper:]')
@@ -369,6 +381,24 @@ else
   BTRFS_LAYOUT='simple'
 fi
 
+if [[ $luks ]]; then
+  case $(echo "$luks" | tr '[:upper:]' '[:lower:]') in
+    yes)
+      LUKS='yes'
+      ;;
+    no)
+      LUKS='no'
+      ;;
+    *)
+      warn "unknown option -- ${luks}"
+      usage
+      exit 1
+      ;;
+  esac
+else
+  LUKS='yes'
+fi
+
 if [[ $grub_passphrase ]]; then
   case $(echo "$grub_passphrase" | tr '[:upper:]' '[:lower:]') in
     yes)
@@ -421,6 +451,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
+    -var "luks=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -on-error=$ON_ERROR \\
     -force \\
@@ -437,6 +468,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
+    -var "luks=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -on-error=$ON_ERROR \\
     $template
@@ -453,6 +485,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
+      -var "luks=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -on-error=$ON_ERROR \
       -force \
@@ -467,6 +500,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
+      -var "luks=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -on-error=$ON_ERROR \
       $template

@@ -143,6 +143,21 @@ However, this can be done via another repository with an extra Vagrantfile and t
 vagrant box add arch ../packer-archlinux/output/packer_arch_luks_btrfs_virtualbox-2020.07.01.box --force
 ~~~~
 
+### LUKS encryption
+
+The box can be built with or without disk encryption via LUKS. Note: A LUKS1 header is used because grub cannot decrypt LUKS2 headers yet.
+
+With packer:
+
+~~~~
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=simple" -var "luks_encryption=no" -on-error=ask -force arch-template-luks-btrfs.json
+~~~~
+
+With wrapacker:
+
+~~~~
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --luks=no --btrfs-layout=simple --on-error=ask --force arch-template-luks-btrfs.json
+~~~~
 
 ### Btrfs layouts
 
