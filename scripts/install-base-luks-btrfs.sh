@@ -28,6 +28,8 @@ SWAP_NAME="cryptArchSwap"
 ROOT_NAME="cryptArchSystem"
 DATA_NAME="cryptData"
 BTRFS_LAYOUT=${BTRFS_LAYOUT:-current}
+GRUB_PASSPHRASE=${GRUB_PASSPHRASE:-yes}
+GRUB_BUILD_SCRIPT='/usr/local/bin/build-grub.sh'
 TARGET_DIR='/mnt'
 COUNTRY=${COUNTRY:-US}
 MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
@@ -275,15 +277,47 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub
     ;;
   *)
-    echo ">>>> install-base.sh: Installing grub bootloader.."
-    /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub
+    if [[ $GRUB_PASSPHRASE == "yes" ]]; then
+      echo ">>>> install-base.sh: Installing grub bootloader.."
+      /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub
+    else
+      echo ">>>> install-base.sh: Installing base-devel group.."
+      /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm base-devel
+      /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
+      GRUB_BUILD_SCRIPT_SHORT=`basename "$GRUB_BUILD_SCRIPT"`
+      cat <<-EOF > "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
+      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Downloading grub bootloader.."
+      # Need to create build directory, because it didn't work with /tmp and arch-chroot
+      mkdir /build
+      chown nobody.nobody /build
+      cd /build
+      sudo -u nobody curl -L -O https://aur.archlinux.org/cgit/aur.git/snapshot/grub-luks-keyfile.tar.gz
+      sudo -u nobody tar -xvzf grub-luks-keyfile.tar.gz
+      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Compiling grub bootloader.."
+      # https://grub.johnlane.ie
+      # https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package
+      # https://github.com/rmarquis/pacaur/commit/65d419cae99a7c27b97d32467167b3745c5c77b6
+      cd grub-luks-keyfile
+      sudo -u nobody makepkg --syncdeps --rmdeps --clean --skippgpcheck --log --noconfirm &>/dev/null
+      if [ $? -ne 0 ]; then
+        echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: grub-luks-keyfile couldn't been build. Connect via SSH and check the logfile."
+      fi
+      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Installing grub bootloader.."
+      sudo -u nobody makepkg --install --noconfirm
+      rm -rf /build
+EOF
+      echo 'nobody ALL=(ALL) NOPASSWD: ALL' >> ${TARGET_DIR}/etc/sudoers.d/10_nobody
+      /usr/bin/arch-chroot ${TARGET_DIR} ${GRUB_BUILD_SCRIPT}
+      rm "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
+      rm ${TARGET_DIR}/etc/sudoers.d/10_nobody
+    fi
     ;;
 esac
 echo ">>>> install-base.sh: Installing basic packages.."
 # Need to install netctl as well: https://github.com/archlinux/arch-boxes/issues/70
 # Can be removed when Vagrant's Arch plugin will use systemd-networkd: https://github.com/hashicorp/vagrant/pull/11400
 # Probably included in Vagrant 2.3.0?
-/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub efibootmgr btrfs-progs dhcpcd netctl sudo vim
+/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm efibootmgr btrfs-progs dhcpcd netctl sudo vim
 /usr/bin/arch-chroot ${TARGET_DIR} ln -sf /usr/bin/vim /usr/bin/vi
 /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm openssh
 
@@ -367,6 +401,13 @@ cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
   /usr/bin/locale-gen
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring grub.."
   /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch
+  if [[ ${GRUB_PASSPHRASE} == "no" ]]; then
+    cp /root/crypt_keyfile.bin /boot/efi/EFI/arch/crypt_keyfile.bin
+    echo 'cryptomount -k (hd0,gpt1)/efi/arch/crypt_keyfile.bin (hd0,gpt3)' > /tmp/load.cfg
+    grub-mkimage --directory=/usr/lib/grub/x86_64-efi --prefix='(crypto0)/@/boot/grub' \
+      --output=/boot/efi/EFI/arch/grubx64.efi --format=x86_64-efi --compression=auto \
+      --config=/tmp/load.cfg btrfs cryptodisk luks gcry_rijndael gcry_rijndael gcry_sha256 part_gpt fat normal configfile
+  fi
   /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
   # additinal step is necessary if VirtualBox is used
   # add grub to EFI shell autostart:
@@ -411,4 +452,8 @@ echo ">>>> install-base.sh: Completing installation.."
 /usr/bin/umount -R ${TARGET_DIR}
 /usr/bin/swapoff -a
 /usr/bin/systemctl reboot
-echo ">>>> install-base.sh: Basic installation complete. Type in grub passphrase to continue with $PACKER_BUILDER_TYPE configuration."
+if [[ ${GRUB_PASSPHRASE} == "yes" ]]; then
+  echo ">>>> install-base.sh: Basic installation complete. Type in grub passphrase to continue with $PACKER_BUILDER_TYPE configuration."
+else
+  echo ">>>> install-base.sh: Basic installation complete. Continueing with $PACKER_BUILDER_TYPE configuration.."
+fi

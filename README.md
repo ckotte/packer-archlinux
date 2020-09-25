@@ -16,7 +16,7 @@ My goal is to duplicate the configuration of my Arch Linux laptop:
 * UEFI boot
 * LUKS encrypted partitions with the Btrfs filesystem
 * LUKS encrypted swap partition
-* Includes the `base` meta package and `base-devel` group
+* Includes the `base` meta package and `base-devel` group (needed to compile grub-luks-keyfile)
 * OpenSSH is also installed and enabled on boot (needed for Packer and Vagrant)
 
 The installation script follows the
@@ -162,4 +162,20 @@ With wrapacker:
 
 ~~~~
 ./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
+~~~~
+
+### Grub
+
+You need to enter a password ("vagrant") with grub every time the VM boots to unlock /boot. It's possible to use grub-luks-keyfile and and the keyfile to automatically unlock /boot. Note: This is only for testing. This shouldn't be done outside a (Vagrant) Virtual Machine.
+
+With packer:
+
+~~~~
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=current" -var "grub_passphrase=no" -on-error=ask -force arch-template-luks-btrfs.json
+~~~~
+
+With wrapacker:
+
+~~~~
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~

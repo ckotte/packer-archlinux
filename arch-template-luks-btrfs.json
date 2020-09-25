@@ -6,6 +6,7 @@
         "country": "US",
         "write_zeros": "true",
         "btrfs_layout": "current",
+        "grub_passphrase": "yes",
         "headless": "false"
     },
     "builders": [
@@ -116,7 +117,7 @@
     "provisioners": [
         {
             "type": "shell",
-            "execute_command": "{{ .Vars }} COUNTRY={{ user `country` }} BTRFS_LAYOUT={{ user `btrfs_layout` }} sudo -E -S bash '{{ .Path }}'",
+            "execute_command": "{{ .Vars }} COUNTRY={{ user `country` }} BTRFS_LAYOUT={{ user `btrfs_layout` }} GRUB_PASSPHRASE={{ user `grub_passphrase` }} sudo -E -S bash '{{ .Path }}'",
             "expect_disconnect": true,
             "script": "scripts/install-base-luks-btrfs.sh"
         },

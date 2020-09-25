@@ -65,7 +65,7 @@ validate_country() {
 # print this script's usage message to stderr
 usage() {
   cat <<-EOF >&2
-  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-b BTRFS LAYOUT] [-o ON-ERROR ACTION] [-f] [-d] [-h] [template]
+  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-b BTRFS LAYOUT] [-g GRUB PASSPHRASE] [-o ON-ERROR ACTION] [-f] [-d] [-h] [template]
 EOF
 }
 
@@ -145,6 +145,10 @@ help() {
               the btrfs layout that should be used
               defaults to simple
 
+       -g, --grub-passphrase=yes|no
+              required to enter a grub passphrase; a patched grub and the keyfile is used if set to no
+              defaults to yes
+
        -o, --on-error=ACTION
               error handling if the build fails;
               defaults to cleanup
@@ -187,6 +191,7 @@ dry_run=false
 timeout=''
 skip_write_zeros=false
 btrfs_layout='current'
+grub_passphrase='yes'
 on_error=''
 force=false
 headless=false
@@ -225,6 +230,13 @@ while [[ $1 != '' ]]; do
       ;;
     --btrfs-layout=*)
       btrfs_layout=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      ;;
+    -g | --grub-passphrase)
+      grub_passphrase=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      shift
+      ;;
+    --grub-passphrase=*)
+      grub_passphrase=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
       ;;
     -o | --on-error)
       on_error=$2
@@ -356,6 +368,24 @@ else
   BTRFS_LAYOUT='simple'
 fi
 
+if [[ $grub_passphrase ]]; then
+  case $(echo "$grub_passphrase" | tr '[:upper:]' '[:lower:]') in
+    yes)
+      GRUB_PASSPHRASE='yes'
+      ;;
+    no)
+      GRUB_PASSPHRASE='no'
+      ;;
+    *)
+      warn "unknown option -- ${grub_passphrase}"
+      usage
+      exit 1
+      ;;
+  esac
+else
+  GRUB_PASSPHRASE='yes'
+fi
+
 if [[ $on_error ]]; then
   case $(echo "$on_error" | tr '[:upper:]' '[:lower:]') in
     cleanup)
@@ -390,6 +420,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
+    -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -on-error=$ON_ERROR \\
     -force \\
     $template
@@ -405,6 +436,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
+    -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -on-error=$ON_ERROR \\
     $template
 EOF
@@ -420,6 +452,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
+      -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -on-error=$ON_ERROR \
       -force \
       $template
@@ -433,6 +466,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
+      -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -on-error=$ON_ERROR \
       $template
   fi
