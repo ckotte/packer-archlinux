@@ -103,6 +103,8 @@ For debugging purposes, execute:
 
     $ PACKER_LOG=1 ./wrapacker --country=US --provider=virtualbox --on-error=ask --force
 
+    $ PACKER_LOG=1 PACKER_LOG_PATH="packer.log" ./wrapacker --country=US --provider=virtualbox --on-error=ask --force
+
 See the `--help` flag for additional details.
 
 Known Issues
