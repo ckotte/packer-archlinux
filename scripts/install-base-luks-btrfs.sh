@@ -399,56 +399,56 @@ echo ">>>> install-base.sh: Generating the system configuration script.."
 
 CONFIG_SCRIPT_SHORT=`basename "$CONFIG_SCRIPT"`
 cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring hostname, timezone, and keymap.."
-  echo '${FQDN}' > /etc/hostname
-  /usr/bin/ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-  hwclock --systohc
-  echo 'KEYMAP=${KEYMAP}' > /etc/vconsole.conf
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring locale.."
-  /usr/bin/sed -i 's/#${LANGUAGE}/${LANGUAGE}/' /etc/locale.gen
-  /usr/bin/locale-gen
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring grub.."
-  /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch
-  if [[ ${GRUB_PASSPHRASE} == "no" ]]; then
-    cp /root/crypt_keyfile.bin /boot/efi/EFI/arch/crypt_keyfile.bin
-    echo 'cryptomount -k (hd0,gpt1)/efi/arch/crypt_keyfile.bin (hd0,gpt3)' > /tmp/load.cfg
-    grub-mkimage --directory=/usr/lib/grub/x86_64-efi --prefix='(crypto0)/@/boot/grub' \
-      --output=/boot/efi/EFI/arch/grubx64.efi --format=x86_64-efi --compression=auto \
-      --config=/tmp/load.cfg btrfs cryptodisk luks gcry_rijndael gcry_rijndael gcry_sha256 part_gpt fat normal configfile
-  fi
-  /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
-  # additinal step is necessary if VirtualBox is used
-  # add grub to EFI shell autostart:
-  # - Grub boot doesn't work anymore after the VM got exported by packer
-  # - The system just boots in the EFI shell on a new system deployed via Vagrant (probably because the EFI information doesn't get exported!?)
-  echo '\EFI\arch\grubx64.efi' > /boot/efi/startup.nsh
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Setting root pasword.."
-  /usr/bin/usermod --password ${PASSWORD} root
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring network.."
-  # Disable systemd Predictable Network Interface Names and revert to traditional interface names
-  # https://wiki.archlinux.org/index.php/Network_configuration#Revert_to_traditional_interface_names
-  /usr/bin/ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
-  /usr/bin/systemctl enable dhcpcd@eth0.service
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sshd.."
-  /usr/bin/sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
-  /usr/bin/systemctl enable sshd.service
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring hostname, timezone, and keymap.."
+echo '${FQDN}' > /etc/hostname
+/usr/bin/ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+hwclock --systohc
+echo 'KEYMAP=${KEYMAP}' > /etc/vconsole.conf
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring locale.."
+/usr/bin/sed -i 's/#${LANGUAGE}/${LANGUAGE}/' /etc/locale.gen
+/usr/bin/locale-gen
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring grub.."
+/usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch
+if [[ ${GRUB_PASSPHRASE} == "no" ]]; then
+  cp /root/crypt_keyfile.bin /boot/efi/EFI/arch/crypt_keyfile.bin
+  echo 'cryptomount -k (hd0,gpt1)/efi/arch/crypt_keyfile.bin (hd0,gpt3)' > /tmp/load.cfg
+  grub-mkimage --directory=/usr/lib/grub/x86_64-efi --prefix='(crypto0)/@/boot/grub' \
+    --output=/boot/efi/EFI/arch/grubx64.efi --format=x86_64-efi --compression=auto \
+    --config=/tmp/load.cfg btrfs cryptodisk luks gcry_rijndael gcry_rijndael gcry_sha256 part_gpt fat normal configfile
+fi
+/usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
+# additinal step is necessary if VirtualBox is used
+# add grub to EFI shell autostart:
+# - Grub boot doesn't work anymore after the VM got exported by packer
+# - The system just boots in the EFI shell on a new system deployed via Vagrant (probably because the EFI information doesn't get exported!?)
+echo '\EFI\arch\grubx64.efi' > /boot/efi/startup.nsh
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Setting root pasword.."
+/usr/bin/usermod --password ${PASSWORD} root
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring network.."
+# Disable systemd Predictable Network Interface Names and revert to traditional interface names
+# https://wiki.archlinux.org/index.php/Network_configuration#Revert_to_traditional_interface_names
+/usr/bin/ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
+/usr/bin/systemctl enable dhcpcd@eth0.service
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sshd.."
+/usr/bin/sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
+/usr/bin/systemctl enable sshd.service
 
-  # Vagrant-specific configuration
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Creating vagrant user.."
-  /usr/bin/groupadd -g 1234 vagrant
-  /usr/bin/useradd --password ${PASSWORD} --comment 'Vagrant User' --create-home --uid 1234 --gid 1234 vagrant
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring vagrant cache btrfs volume.."
-  /usr/bin/btrfs subvolume create /home/vagrant/.cache
-  chown vagrant.vagrant /home/vagrant/.cache
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sudo.."
-  echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10_vagrant
-  echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_vagrant
-  /usr/bin/chmod 0440 /etc/sudoers.d/10_vagrant
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring ssh access for vagrant.."
-  /usr/bin/install --directory --owner=vagrant --group=vagrant --mode=0700 /home/vagrant/.ssh
-  /usr/bin/curl --output /home/vagrant/.ssh/authorized_keys --location https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
-  /usr/bin/chown vagrant:vagrant /home/vagrant/.ssh/authorized_keys
-  /usr/bin/chmod 0600 /home/vagrant/.ssh/authorized_keys
+# Vagrant-specific configuration
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Creating vagrant user.."
+/usr/bin/groupadd -g 1234 vagrant
+/usr/bin/useradd --password ${PASSWORD} --comment 'Vagrant User' --create-home --uid 1234 --gid 1234 vagrant
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring vagrant cache btrfs volume.."
+/usr/bin/btrfs subvolume create /home/vagrant/.cache
+chown vagrant.vagrant /home/vagrant/.cache
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sudo.."
+echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10_vagrant
+echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_vagrant
+/usr/bin/chmod 0440 /etc/sudoers.d/10_vagrant
+echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring ssh access for vagrant.."
+/usr/bin/install --directory --owner=vagrant --group=vagrant --mode=0700 /home/vagrant/.ssh
+/usr/bin/curl --output /home/vagrant/.ssh/authorized_keys --location https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
+/usr/bin/chown vagrant:vagrant /home/vagrant/.ssh/authorized_keys
+/usr/bin/chmod 0600 /home/vagrant/.ssh/authorized_keys
 EOF
 
 echo ">>>> install-base.sh: Entering chroot and configuring system.."
