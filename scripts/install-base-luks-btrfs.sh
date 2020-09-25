@@ -91,9 +91,9 @@ echo ">>>> install-base.sh: Initializing swap partition.."
 /usr/bin/swapon -d ${SWAP_DEVICE}
 
 echo ">>>> install-base.sh: Creating filesystems.."
-/usr/bin/mkfs.btrfs -f ${ROOT_DEVICE}
-/usr/bin/mkfs.btrfs -f ${DATA_DEVICE}
 /usr/bin/mkfs.fat -F32 ${EFI_DEVICE}
+/usr/bin/mkfs.btrfs -f -L root ${ROOT_DEVICE}
+/usr/bin/mkfs.btrfs -f -L data ${DATA_DEVICE}
 
 echo ">>>> install-base.sh: Mounting ${ROOT_DEVICE} to ${TARGET_DIR}.."
 /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
