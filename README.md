@@ -181,7 +181,7 @@ With wrapacker:
 
 ### Grub
 
-You need to enter a password ("vagrant") with grub every time the VM boots to unlock /boot. It's possible to use grub-luks-keyfile and and the keyfile to automatically unlock /boot. Note: This is only for testing. This shouldn't be done outside a (Vagrant) Virtual Machine.
+You need to enter a password ("vagrant") with grub every time the VM boots to unlock /boot if LUKS is used. It's possible to use grub-luks-keyfile and the keyfile to automatically unlock /boot in this case. Note: This is only for testing. This shouldn't be done outside a (Vagrant) Virtual Machine.
 
 With packer:
 
