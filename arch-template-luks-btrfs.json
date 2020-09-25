@@ -146,7 +146,7 @@
     "post-processors": [
         {
             "type": "vagrant",
-            "output": "output/packer_arch_custom_{{ .Provider }}-{{isotime \"2006.01\"}}.01.box"
+            "output": "output/packer_arch_luks_btrfs_{{ .Provider }}-{{isotime \"2006.01\"}}.01.box"
         }
     ]
 }

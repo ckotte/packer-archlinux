@@ -140,6 +140,6 @@ provisioning.
 However, this can be done via another repository with an extra Vagrantfile and the packer box imported.
 
 ~~~~
-vagrant box add arch ../packer-archlinux/output/packer_arch_custom_virtualbox-2020.07.01.box --force
+vagrant box add arch ../packer-archlinux/output/packer_arch_luks_btrfs_virtualbox-2020.07.01.box --force
 ~~~~
 
