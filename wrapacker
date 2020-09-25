@@ -198,6 +198,7 @@ skip_write_zeros=false
 btrfs_layout='current'
 luks='yes'
 grub_passphrase='yes'
+install_type=''
 on_error=''
 force=false
 headless=false
@@ -439,6 +440,14 @@ else
   ON_ERROR='cleanup'
 fi
 
+if [[ $LUKS == 'yes' ]]; then
+  install_type='luks_'
+fi
+if [[ $LUKS == "yes" ]] && [[ $GRUB_PASSPHRASE == "no" ]]; then
+  install_type="luks_grub_"
+fi
+install_type+=${BTRFS_LAYOUT}
+
 if [[ $dry_run = true ]]; then
   if [[ $force = true ]]; then
 cat <<-EOF
@@ -453,6 +462,7 @@ cat <<-EOF
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
     -var "luks=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
+    -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
     -force \\
     $template
@@ -470,6 +480,7 @@ cat <<-EOF
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
     -var "luks=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
+    -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
     $template
 EOF
@@ -487,6 +498,7 @@ else
       -var "btrfs_layout=$BTRFS_LAYOUT" \
       -var "luks=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
+      -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
       -force \
       $template
@@ -502,6 +514,7 @@ else
       -var "btrfs_layout=$BTRFS_LAYOUT" \
       -var "luks=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
+      -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
       $template
   fi

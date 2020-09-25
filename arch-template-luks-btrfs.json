@@ -8,6 +8,7 @@
         "btrfs_layout": "current",
         "luks_encryption": "yes",
         "grub_passphrase": "yes",
+        "install_type": "luks_btrfs",
         "headless": "false"
     },
     "builders": [
@@ -155,7 +156,7 @@
     "post-processors": [
         {
             "type": "vagrant",
-            "output": "output/packer_arch_luks_btrfs_{{ .Provider }}-{{isotime \"2006.01\"}}.01.box"
+            "output": "output/packer_arch_{{ user `install_type` }}_{{ .Provider }}-{{isotime \"2006.01\"}}.01.box"
         }
     ]
 }

@@ -115,7 +115,7 @@ provisioning.
 However, this can be done via another repository with an extra Vagrantfile and the packer box imported.
 
 ~~~~
-vagrant box add arch ../packer-archlinux/output/packer_arch_luks_btrfs_virtualbox-2020.07.01.box --force
+vagrant box add arch ../packer-archlinux/output/packer_arch_luks_grub_archlinux_virtualbox-2020.08.01.box --force
 ~~~~
 
 ### LUKS encryption
@@ -169,6 +169,24 @@ With wrapacker:
 ~~~~
 ./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~
+
+### Installation Type
+
+You can control the name of the box file. This is useful if you test different configuration options, but don't want to overwrite previously built boxes.
+
+With packer:
+
+~~~~
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=archlinux" -var "luks_encryption=yes" -var "grub_passphrase=no" -on-error=ask -force arch-template-luks-btrfs.json
+~~~~
+
+With wrapacker:
+
+~~~~
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --luks=yes --btrfs-layout=archlinux --on-error=ask --force arch-template-luks-btrfs.json
+~~~~
+
+> This will create the file in packer_arch_luks_grub_archlinux_virtualbox-<DATE>.box output.
 
 Known Issues
 ------------
