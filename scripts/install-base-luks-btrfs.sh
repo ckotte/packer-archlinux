@@ -284,6 +284,7 @@ echo ">>>> install-base.sh: Installing basic packages.."
 # Can be removed when Vagrant's Arch plugin will use systemd-networkd: https://github.com/hashicorp/vagrant/pull/11400
 # Probably included in Vagrant 2.3.0?
 /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub efibootmgr btrfs-progs dhcpcd netctl sudo vim
+/usr/bin/arch-chroot ${TARGET_DIR} ln -sf /usr/bin/vim /usr/bin/vi
 /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm openssh
 
 echo ">>>> install-base.sh: Generating the filesystem table.."
