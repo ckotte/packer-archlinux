@@ -127,7 +127,7 @@ case "$BTRFS_LAYOUT" in
   "simple")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
     ;;
-  "archlinux")
+  "enhanced")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
     /usr/bin/mkdir -p ${TARGET_DIR}/@/boot/grub/
     # don't create subvolume for Grub BIOS modules
@@ -226,7 +226,7 @@ case "$BTRFS_LAYOUT" in
   "simple")
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
     ;;
-  "archlinux")
+  "enhanced")
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
     /usr/bin/mkdir ${TARGET_DIR}/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/.snapshots
