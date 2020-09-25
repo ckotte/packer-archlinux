@@ -31,7 +31,7 @@ LUKS_ENCRYPTION=${LUKS_ENCRYPTION:-yes}
 BTRFS_LAYOUT=${BTRFS_LAYOUT:-simple}
 GRUB_PASSPHRASE=${GRUB_PASSPHRASE:-yes}
 GRUB_BUILD_SCRIPT='/usr/local/bin/build-grub.sh'
-TARGET_DIR='/mnt'
+TARGET_DIR='/mnt/btrfs'
 COUNTRY=${COUNTRY:-US}
 MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
 
@@ -96,6 +96,7 @@ echo ">>>> install-base.sh: Creating filesystems.."
 /usr/bin/mkfs.btrfs -f -L data ${DATA_DEVICE}
 
 echo ">>>> install-base.sh: Mounting ${ROOT_DEVICE} to ${TARGET_DIR}.."
+/usr/bin/mkdir -p ${TARGET_DIR}
 /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
 
 echo ">>>> install-base.sh: Creating Btrfs subvolumes.."
