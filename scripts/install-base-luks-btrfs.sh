@@ -290,9 +290,6 @@ echo ">>>> install-base.sh: Installing basic packages.."
 echo ">>>> install-base.sh: Generating the filesystem table.."
 /usr/bin/genfstab -p ${TARGET_DIR} >> "${TARGET_DIR}/etc/fstab"
 
-echo ">>>> install-base.sh: Adding filesystem table entry for tmpfs.."
-echo "tmpfs /tmp tmpfs defaults,noatime,mode=1777 0 0" >> "${TARGET_DIR}/etc/fstab"
-
 echo ">>>> install-base.sh: Configuring additional initramfs hooks for LUKS partitions.."
 cat <<-EOF > "${TARGET_DIR}/etc/initcpio/hooks/opendata"
 run_hook ()
