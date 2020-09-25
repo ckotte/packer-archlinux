@@ -434,12 +434,23 @@ echo ">>>> install-base.sh: Configuring initramfs.."
 /usr/bin/sed -i "s=^BINARIES\=.*=BINARIES\=(/usr/bin/btrfs)=" ${TARGET_DIR}/etc/mkinitcpio.conf
 if [[ $LUKS_ENCRYPTION == "yes" ]]; then
   /usr/bin/sed -i "s=^FILES\=.*=FILES\=(/root/crypt_keyfile.bin)=" ${TARGET_DIR}/etc/mkinitcpio.conf
-  # add keymap, openswap, opendata, encrypt, and resume hook
-  /usr/bin/sed -i "s=^HOOKS\=.*=HOOKS\=(base udev autodetect modconf block openswap opendata encrypt filesystems keyboard keymap resume fsck)=" ${TARGET_DIR}/etc/mkinitcpio.conf
+  if [[ $KEYMAP == "us" ]]; then
+    # add openswap, opendata, encrypt, and resume hook
+    INITRAMFS_HOOKS="base udev autodetect modconf block openswap opendata encrypt filesystems keyboard resume fsck"
+  else
+    # add openswap, opendata, encrypt, and resume hook
+    INITRAMFS_HOOKS="base udev autodetect modconf block openswap opendata encrypt filesystems keyboard resume fsck"
+  fi
 else
-  # add keymap and resume hook
-  /usr/bin/sed -i "s=^HOOKS\=.*=HOOKS\=(base udev autodetect modconf block filesystems keyboard keymap resume fsck)=" ${TARGET_DIR}/etc/mkinitcpio.conf
+  if [[ $KEYMAP == "us" ]]; then
+    # add resume hook
+    INITRAMFS_HOOKS="base udev autodetect modconf block filesystems keyboard resume fsck"
+  else
+    # add keymap and resume hook
+    INITRAMFS_HOOKS="base udev autodetect modconf block filesystems keyboard keymap resume fsck"
+  fi
 fi
+/usr/bin/sed -i "s=^HOOKS\=.*=HOOKS\=(${INITRAMFS_HOOKS})=" ${TARGET_DIR}/etc/mkinitcpio.conf
 
 echo ">>>> install-base.sh: Creating new initramfs.."
 /usr/bin/arch-chroot ${TARGET_DIR} mkinitcpio -p linux
