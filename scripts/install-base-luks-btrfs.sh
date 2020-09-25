@@ -156,11 +156,8 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib/libvirt
     # default location for virtual machine images managed with libvirt
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home-snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log-snapshots
     /usr/bin/mkdir ${TARGET_DIR}/@snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/root
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/home
@@ -168,18 +165,6 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/root
     /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/home
     /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/var-log
-    # Subvolumes
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-cache
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-tmp
-    # # default location for virtual machine images managed with systemd-nspawn
-    # # The /var/lib/machine subvolume is created automatically by systemd. Unfortunately, without CoW disabled
-    # # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-machines
-    # # default location for portable service images
-    # # The /var/lib/portables subvolume is created automatically by systemd.
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-portables
-    # # default location for virtual machine images managed with libvirt
-    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-libvirt-images
     /usr/bin/btrfs subvolume create ${DATA_TARGET_DIR}/@
     ;;
   "opensuse")
@@ -241,33 +226,17 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
     /usr/bin/mkdir ${TARGET_DIR}/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/.snapshots
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots ${ROOT_DEVICE} ${TARGET_DIR}/.snapshots
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/root ${ROOT_DEVICE} ${TARGET_DIR}/.snapshots
     /usr/bin/mkdir ${TARGET_DIR}/home
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home ${ROOT_DEVICE} ${TARGET_DIR}/home
-    # TODO: or create subvolume later for /home/<user> ??
     /usr/bin/mkdir ${TARGET_DIR}/home/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/home/.snapshots
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/home ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
     /usr/bin/mkdir -p ${TARGET_DIR}/var/log
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log
     /usr/bin/mkdir ${TARGET_DIR}/var/log/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/var/log/.snapshots
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
-    # /usr/bin/mkdir -p ${TARGET_DIR}/var/cache
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-cache ${ROOT_DEVICE} ${TARGET_DIR}/var/cache
-    # /usr/bin/mkdir -p ${TARGET_DIR}/var/tmp
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-tmp ${ROOT_DEVICE} ${TARGET_DIR}/var/tmp
-    # # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
-    # /usr/bin/chmod 1777 ${TARGET_DIR}/var/tmp
-    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/machines
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-machines ${ROOT_DEVICE} ${TARGET_DIR}/var/lib/machines
-    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/portables
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-portables ${ROOT_DEVICE} ${TARGET_DIR}/var/lib/portables
-    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/libvirt/images
-    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-libvirt-images ${ROOT_DEVICE} ${TARGET_DIR}/var/lib/libvirt/images
     ;;
   "opensuse")
     /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
