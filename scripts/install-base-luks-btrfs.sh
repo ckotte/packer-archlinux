@@ -171,13 +171,13 @@ case "$BTRFS_LAYOUT" in
     echo ">>>> install-base.sh: Configuring 'first root filesystem' snapshot.."
     DATE=$(date +"%Y-%m-%d %H:%M:%S")
     cat <<-EOF > "${TARGET_DIR}/@/.snapshots/1/info.xml"
-    <?xml version="1.0"?>
-    <snapshot>
-      <type>single</type>
-      <num>1</num>
-      <date>${DATE}</date>
-      <description>first root filesystem</description>
-    </snapshot>
+<?xml version="1.0"?>
+<snapshot>
+  <type>single</type>
+  <num>1</num>
+  <date>${DATE}</date>
+  <description>first root filesystem</description>
+</snapshot>
 EOF
     echo ">>>> install-base.sh: Setting 'first root filesystem' snapshot as the default snapshot.."
     /usr/bin/btrfs subvolume set-default $(/usr/bin/btrfs subvolume list ${TARGET_DIR} | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') ${TARGET_DIR}
