@@ -433,7 +433,7 @@ echo ">>>> install-base.sh: Configuring initramfs.."
 /usr/bin/sed -i "s=^MODULES\=.*=MODULES\=(loop)=" ${TARGET_DIR}/etc/mkinitcpio.conf
 /usr/bin/sed -i "s=^BINARIES\=.*=BINARIES\=(/usr/bin/btrfs)=" ${TARGET_DIR}/etc/mkinitcpio.conf
 if [[ $LUKS_ENCRYPTION == "yes" ]]; then
-  /usr/bin/sed -i "s=^FILES\=.*=FILES\=(/root/crypt_keyfile.bin)=" ${TARGET_DIR}/etc/mkinitcpio.conf
+  INITRAMFS_FILES="/root/crypt_keyfile.bin"
   if [[ $KEYMAP == "us" ]]; then
     # add openswap, opendata, encrypt, and resume hook
     INITRAMFS_HOOKS="base udev autodetect modconf block openswap opendata encrypt filesystems keyboard resume fsck"
@@ -450,6 +450,7 @@ else
     INITRAMFS_HOOKS="base udev autodetect modconf block filesystems keyboard keymap resume fsck"
   fi
 fi
+/usr/bin/sed -i "s=^FILES\=.*=FILES\=(${INITRAMFS_FILES})=" ${TARGET_DIR}/etc/mkinitcpio.conf
 /usr/bin/sed -i "s=^HOOKS\=.*=HOOKS\=(${INITRAMFS_HOOKS})=" ${TARGET_DIR}/etc/mkinitcpio.conf
 
 echo ">>>> install-base.sh: Creating new initramfs.."
