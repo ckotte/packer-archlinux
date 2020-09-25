@@ -149,11 +149,18 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib/libvirt
     # default location for virtual machine images managed with libvirt
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home-snapshots
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home-snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log-snapshots
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log-snapshots
+    /usr/bin/mkdir ${TARGET_DIR}/@snapshots
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/root
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/home
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/var-log
+    /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/root
+    /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/home
+    /usr/bin/chmod 750 ${TARGET_DIR}/@snapshots/var-log
     # Subvolumes
     # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-cache
     # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-tmp
@@ -223,18 +230,21 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
     /usr/bin/mkdir ${TARGET_DIR}/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/.snapshots
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots ${ROOT_DEVICE} ${TARGET_DIR}/.snapshots
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots ${ROOT_DEVICE} ${TARGET_DIR}/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/root ${ROOT_DEVICE} ${TARGET_DIR}/.snapshots
     /usr/bin/mkdir ${TARGET_DIR}/home
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home ${ROOT_DEVICE} ${TARGET_DIR}/home
     # TODO: or create subvolume later for /home/<user> ??
     /usr/bin/mkdir ${TARGET_DIR}/home/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/home/.snapshots
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/home ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
     /usr/bin/mkdir -p ${TARGET_DIR}/var/log
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log
     /usr/bin/mkdir ${TARGET_DIR}/var/log/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/var/log/.snapshots
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log-snapshots ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
     # /usr/bin/mkdir -p ${TARGET_DIR}/var/cache
     # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-cache ${ROOT_DEVICE} ${TARGET_DIR}/var/cache
     # /usr/bin/mkdir -p ${TARGET_DIR}/var/tmp
