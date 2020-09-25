@@ -152,6 +152,14 @@ The box can be built with different Btrfs layouts:
 * archlinux: Several subvolumes.
 * opensuse: openSUSE layout. Note: Cannot be booted because openSUSE-patched version of grub is needed.
 
+With packer:
+
 ~~~~
 packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=current" -on-error=ask -force arch-template-luks-btrfs.json
+~~~~
+
+With wrapacker:
+
+~~~~
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~
