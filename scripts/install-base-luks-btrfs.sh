@@ -75,6 +75,7 @@ if [[ $LUKS_ENCRYPTION == "yes" ]]; then
   echo -n "vagrant" | /usr/bin/cryptsetup open ${DISK}${DATA_PARTITION} ${DATA_NAME} -
 fi
 
+EFI_DEVICE=${DISK}${EFI_PARTITION}
 if [[ $LUKS_ENCRYPTION == "yes" ]]; then
   SWAP_DEVICE=/dev/mapper/${SWAP_NAME}
   ROOT_DEVICE=/dev/mapper/${ROOT_NAME}
@@ -90,9 +91,9 @@ echo ">>>> install-base.sh: Initializing swap partition.."
 /usr/bin/swapon -d ${SWAP_DEVICE}
 
 echo ">>>> install-base.sh: Creating filesystems.."
-/usr/bin/mkfs.fat -F32 ${DISK}${EFI_PARTITION}
 /usr/bin/mkfs.btrfs -f ${ROOT_DEVICE}
 /usr/bin/mkfs.btrfs -f ${DATA_DEVICE}
+/usr/bin/mkfs.fat -F32 ${EFI_DEVICE}
 
 echo ">>>> install-base.sh: Mounting ${ROOT_DEVICE} to ${TARGET_DIR}.."
 /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
@@ -284,7 +285,7 @@ echo ">>>> install-base.sh: Disabling copy-on-write for /var .."
 
 echo ">>>> install-base.sh: Mounting EFI partition to ${TARGET_DIR}/boot/efi.."
 /usr/bin/mkdir -p ${TARGET_DIR}/boot/efi
-/usr/bin/mount ${DISK}${EFI_PARTITION} ${TARGET_DIR}/boot/efi
+/usr/bin/mount ${EFI_DEVICE} ${TARGET_DIR}/boot/efi
 
 echo ">>>> install-base.sh: Setting pacman ${COUNTRY} mirrors.."
 curl -s "$MIRRORLIST" |  sed 's/^#Server/Server/' > /etc/pacman.d/mirrorlist
