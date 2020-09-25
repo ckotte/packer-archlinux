@@ -36,7 +36,7 @@ should be good to clone this repo and go:
 
     $ git clone https://github.com/ckotte/packer-archlinux.git
     $ cd packer-archlinux/
-    $ packer build -only=virtualbox-iso arch-template-custom.json
+    $ packer build -only=virtualbox-iso arch-template-luks-btrfs.json
 
 Then you can import the generated box into Vagrant:
 
@@ -52,7 +52,7 @@ this repo and go:
 
     $ git clone https://github.com/ckotte/packer-archlinux.git
     $ cd packer-archlinux/
-    $ packer build -only=vmware-iso arch-template-custom.json
+    $ packer build -only=vmware-iso arch-template-luks-btrfs.json
 
 Then you can import the generated box into Vagrant:
 
@@ -67,7 +67,7 @@ this repo and go:
 
     $ git clone https://github.com/ckotte/packer-archlinux.git
     $ cd packer-archlinux/
-    $ packer build -only=parallels-iso arch-template-custom.json
+    $ packer build -only=parallels-iso arch-template-luks-btrfs.json
 
 Then you can import the generated box into Vagrant:
 
@@ -82,7 +82,7 @@ this repo and go:
 
     $ git clone https://github.com/ckotte/packer-archlinux.git
     $ cd packer-archlinux/
-    $ packer build -only=qemu arch-template-custom.json
+    $ packer build -only=qemu arch-template-luks-btrfs.json
 
 Then you can import the generated box into Vagrant:
 
