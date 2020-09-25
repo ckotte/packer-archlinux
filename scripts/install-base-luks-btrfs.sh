@@ -292,25 +292,25 @@ case "$BTRFS_LAYOUT" in
       /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
       GRUB_BUILD_SCRIPT_SHORT=`basename "$GRUB_BUILD_SCRIPT"`
       cat <<-EOF > "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
-      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Downloading grub bootloader.."
-      # Need to create build directory, because it didn't work with /tmp and arch-chroot
-      mkdir /build
-      chown nobody.nobody /build
-      cd /build
-      sudo -u nobody curl -L -O https://aur.archlinux.org/cgit/aur.git/snapshot/grub-luks-keyfile.tar.gz
-      sudo -u nobody tar -xvzf grub-luks-keyfile.tar.gz
-      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Compiling grub bootloader.."
-      # https://grub.johnlane.ie
-      # https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package
-      # https://github.com/rmarquis/pacaur/commit/65d419cae99a7c27b97d32467167b3745c5c77b6
-      cd grub-luks-keyfile
-      sudo -u nobody makepkg --syncdeps --rmdeps --clean --skippgpcheck --log --noconfirm &>/dev/null
-      if [ $? -ne 0 ]; then
-        echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: grub-luks-keyfile couldn't been build. Connect via SSH and check the logfile."
-      fi
-      echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Installing grub bootloader.."
-      sudo -u nobody makepkg --install --noconfirm
-      rm -rf /build
+echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Downloading grub bootloader.."
+# Need to create build directory, because it didn't work with /tmp and arch-chroot
+mkdir /build
+chown nobody.nobody /build
+cd /build
+sudo -u nobody curl -L -O https://aur.archlinux.org/cgit/aur.git/snapshot/grub-luks-keyfile.tar.gz
+sudo -u nobody tar -xvzf grub-luks-keyfile.tar.gz
+echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Compiling grub bootloader.."
+# https://grub.johnlane.ie
+# https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package
+# https://github.com/rmarquis/pacaur/commit/65d419cae99a7c27b97d32467167b3745c5c77b6
+cd grub-luks-keyfile
+sudo -u nobody makepkg --syncdeps --rmdeps --clean --skippgpcheck --log --noconfirm &>/dev/null
+if [ $? -ne 0 ]; then
+  echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: grub-luks-keyfile couldn't been build. Connect via SSH and check the logfile."
+fi
+echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Installing grub bootloader.."
+sudo -u nobody makepkg --install --noconfirm
+rm -rf /build
 EOF
       echo 'nobody ALL=(ALL) NOPASSWD: ALL' >> ${TARGET_DIR}/etc/sudoers.d/10_nobody
       /usr/bin/arch-chroot ${TARGET_DIR} ${GRUB_BUILD_SCRIPT}
