@@ -344,6 +344,9 @@ echo ">>>> install-base.sh: Configuring initramfs.."
 /usr/bin/sed -i "s=^FILES\=.*=FILES\=(/root/crypt_keyfile.bin)=" ${TARGET_DIR}/etc/mkinitcpio.conf
 /usr/bin/sed -i "s=^HOOKS\=.*=HOOKS\=(base udev autodetect modconf block keyboard keymap openswap opendata encrypt filesystems resume fsck)=" ${TARGET_DIR}/etc/mkinitcpio.conf
 
+echo ">>>> install-base.sh: Creating new initramfs.."
+/usr/bin/arch-chroot ${TARGET_DIR} mkinitcpio -p linux
+
 echo ">>>> install-base.sh: Configuring grub.."
 /usr/bin/sed -i "s=^GRUB_CMDLINE_LINUX_DEFAULT\=.*=GRUB_CMDLINE_LINUX_DEFAULT\='loglevel\=3'=" ${TARGET_DIR}/etc/default/grub
 /usr/bin/sed -i "s=^GRUB_CMDLINE_LINUX\=.*=GRUB_CMDLINE_LINUX\='cryptdevice\=${DISK}${ROOT_PARTITION}:${ROOT_NAME} cryptkey\=rootfs:/root/crypt_keyfile.bin resume\=/dev/mapper/${SWAP_NAME}'=" ${TARGET_DIR}/etc/default/grub
@@ -362,8 +365,6 @@ cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring locale.."
   /usr/bin/sed -i 's/#${LANGUAGE}/${LANGUAGE}/' /etc/locale.gen
   /usr/bin/locale-gen
-  echo ">>>> ${CONFIG_SCRIPT_SHORT}: Creating initramfs.."
-  /usr/bin/mkinitcpio -p linux
   # needs to be executed inside the chroot
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring grub.."
   /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch
