@@ -365,7 +365,6 @@ cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring locale.."
   /usr/bin/sed -i 's/#${LANGUAGE}/${LANGUAGE}/' /etc/locale.gen
   /usr/bin/locale-gen
-  # needs to be executed inside the chroot
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring grub.."
   /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch
   /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
