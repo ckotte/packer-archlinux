@@ -32,6 +32,7 @@ BTRFS_LAYOUT=${BTRFS_LAYOUT:-simple}
 GRUB_PASSPHRASE=${GRUB_PASSPHRASE:-yes}
 GRUB_BUILD_SCRIPT='/usr/local/bin/build-grub.sh'
 TARGET_DIR='/mnt/btrfs'
+DATA_TARGET_DIR='/mnt/btrfs-data'
 COUNTRY=${COUNTRY:-US}
 MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
 
@@ -99,6 +100,10 @@ echo ">>>> install-base.sh: Mounting ${ROOT_DEVICE} to ${TARGET_DIR}.."
 /usr/bin/mkdir -p ${TARGET_DIR}
 /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
 
+echo ">>>> install-base.sh: Mounting ${DATA_DEVICE} to ${DATA_TARGET_DIR}.."
+/usr/bin/mkdir -p ${DATA_TARGET_DIR}
+/usr/bin/mount ${DATA_DEVICE} ${DATA_TARGET_DIR}
+
 echo ">>>> install-base.sh: Creating Btrfs subvolumes.."
 case "$BTRFS_LAYOUT" in
   "current")
@@ -127,6 +132,7 @@ case "$BTRFS_LAYOUT" in
     ;;
   "simple")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
+    /usr/bin/btrfs subvolume create ${DATA_TARGET_DIR}/@
     ;;
   "enhanced")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
@@ -174,6 +180,7 @@ case "$BTRFS_LAYOUT" in
     # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-portables
     # # default location for virtual machine images managed with libvirt
     # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-libvirt-images
+    /usr/bin/btrfs subvolume create ${DATA_TARGET_DIR}/@
     ;;
   "opensuse")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
@@ -214,6 +221,9 @@ esac
 
 echo ">>>> install-base.sh: Unmounting ${TARGET_DIR}.."
 /usr/bin/umount ${TARGET_DIR}
+
+echo ">>>> install-base.sh: Unmounting ${DATA_TARGET_DIR}.."
+/usr/bin/umount ${DATA_TARGET_DIR}
 
 echo ">>>> install-base.sh: Mounting Btrfs subvolumes to ${TARGET_DIR}.."
 case "$BTRFS_LAYOUT" in
