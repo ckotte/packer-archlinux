@@ -284,8 +284,18 @@ case "$BTRFS_LAYOUT" in
     ;;
 esac
 
-echo ">>>> install-base.sh: Disabling copy-on-write for /var .."
-/usr/bin/chattr -R +C ${TARGET_DIR}/var
+case "$BTRFS_LAYOUT" in
+  "enhanced")
+    echo ">>>> install-base.sh: Disabling copy-on-write for some directories in /var .."
+    /usr/bin/chattr +C ${TARGET_DIR}/var/lib/machines
+    /usr/bin/chattr +C ${TARGET_DIR}/var/lib/portables
+    /usr/bin/chattr +C ${TARGET_DIR}/var/lib/libvirt/images
+    ;;
+  "current"|"simple"|"opensuse")
+    echo ">>>> install-base.sh: Disabling copy-on-write for /var .."
+    /usr/bin/chattr -R +C ${TARGET_DIR}/var
+    ;;
+esac
 
 # don't configure Btrfs quotas
 #echo ">>>> install-base.sh: Enabling quotas for Btrfs subvolumes.."
