@@ -1,7 +1,7 @@
-Packer Arch
-===========
+Packer Archlinux
+================
 
-Packer Arch is a bare bones [Packer](https://www.packer.io/) template and
+Packer Archlinux is a [Packer](https://www.packer.io/) template and
 installation script that can be used to generate a [Vagrant](https://www.vagrantup.com/)
 base box for [Arch Linux](https://www.archlinux.org/). The template works
 with the default VirtualBox provider as well as with
@@ -11,16 +11,13 @@ and [libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) providers.
 Overview
 --------
 
-My goal was to roughly duplicate the attributes from a
-[DigitalOcean](https://www.digitalocean.com/) Arch Linux droplet:
+My goal is to duplicate the configuration of my Arch Linux laptop:
 
-* 64-bit
-* 20 GB disk
-* 512 MB memory
-* Only a single /root partition (ext4)
-* No swap
+* UEFI boot
+* LUKS encrypted partitions with the Btrfs filesystem
+* LUKS encrypted swap partition
 * Includes the `base` meta package and `base-devel` group
-* OpenSSH is also installed and enabled on boot
+* OpenSSH is also installed and enabled on boot (needed for Packer and Vagrant)
 
 The installation script follows the
 [official installation guide](https://wiki.archlinux.org/index.php/Installation_Guide)
@@ -37,9 +34,9 @@ Assuming that you already have Packer,
 [VirtualBox](https://www.virtualbox.org/), and Vagrant installed, you
 should be good to clone this repo and go:
 
-    $ git clone https://github.com/elasticdog/packer-arch.git
-    $ cd packer-arch/
-    $ packer build -only=virtualbox-iso arch-template.json
+    $ git clone https://github.com/ckotte/packer-archlinux.git
+    $ cd packer-archlinux/
+    $ packer build -only=virtualbox-iso arch-template-custom.json
 
 Then you can import the generated box into Vagrant:
 
@@ -53,9 +50,9 @@ Assuming that you already have Packer,
 Vagrant with the VMware provider installed, you should be good to clone
 this repo and go:
 
-    $ git clone https://github.com/elasticdog/packer-arch.git
-    $ cd packer-arch/
-    $ packer build -only=vmware-iso arch-template.json
+    $ git clone https://github.com/ckotte/packer-archlinux.git
+    $ cd packer-archlinux/
+    $ packer build -only=vmware-iso arch-template-custom.json
 
 Then you can import the generated box into Vagrant:
 
@@ -68,9 +65,9 @@ Assuming that you already have Packer,
 Vagrant with the Parallels provider installed, you should be good to clone
 this repo and go:
 
-    $ git clone https://github.com/elasticdog/packer-arch.git
-    $ cd packer-arch/
-    $ packer build -only=parallels-iso arch-template.json
+    $ git clone https://github.com/ckotte/packer-archlinux.git
+    $ cd packer-archlinux/
+    $ packer build -only=parallels-iso arch-template-custom.json
 
 Then you can import the generated box into Vagrant:
 
@@ -80,12 +77,12 @@ Then you can import the generated box into Vagrant:
 
 Assuming that you already have Packer, Vagrant with the
 [vagrant-libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt)
-plugin installed, you should be good to clone
+plugin, and [QEMU](https://www.qemu.org) installed, you should be good to clone
 this repo and go:
 
-    $ git clone https://github.com/elasticdog/packer-arch.git
-    $ cd packer-arch/
-    $ packer build -only=qemu arch-template.json
+    $ git clone https://github.com/ckotte/packer-archlinux.git
+    $ cd packer-archlinux/
+    $ packer build -only=qemu arch-template-custom.json
 
 Then you can import the generated box into Vagrant:
 
@@ -136,9 +133,11 @@ guest additions work just fine.
 ### Vagrant Provisioners
 
 The box purposefully does not include Puppet, Chef or Ansible for automatic Vagrant
-provisioning. My intention was to duplicate a DigitalOcean VPS and
-furthermore use the VM for testing [Ansible](http://www.ansible.com/)
-playbooks for configuration management.
+provisioning.
 
+However, this can be done via another repository with an extra Vagrantfile and the packer box imported.
 
+~~~~
+vagrant box add arch ../packer-archlinux/output/packer_arch_custom_virtualbox-2020.07.01.box --force
+~~~~
 
