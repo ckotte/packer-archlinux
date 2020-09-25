@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# wrapacker - https://github.com/elasticdog/packer-arch
+# wrapacker
 #
 # A script to automatically ensure the latest ISO download URL and optionally
 # use a mirror from the provided country in order to build an Arch Linux box
