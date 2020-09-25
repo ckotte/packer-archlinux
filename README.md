@@ -107,17 +107,6 @@ For debugging purposes, execute:
 
 See the `--help` flag for additional details.
 
-### Vagrant Provisioners
-
-The box purposefully does not include Puppet, Chef or Ansible for automatic Vagrant
-provisioning.
-
-However, this can be done via another repository with an extra Vagrantfile and the packer box imported.
-
-~~~~
-vagrant box add arch ../packer-archlinux/output/packer_arch_luks_grub_enhanced_virtualbox-2020.08.01.box --force
-~~~~
-
 ### LUKS encryption
 
 The box can be built with or without disk encryption via LUKS. Note: A LUKS1 header is used because grub cannot decrypt LUKS2 headers yet.
@@ -190,3 +179,14 @@ With wrapacker:
 
 Known Issues
 ------------
+
+### Vagrant Provisioners
+
+The box purposefully does not include Puppet, Chef or Ansible for automatic Vagrant
+provisioning.
+
+However, this can be done via another repository with an extra Vagrantfile and the packer box imported.
+
+~~~~
+vagrant box add arch ../packer-archlinux/output/packer_arch_luks_grub_enhanced_virtualbox-2020.08.01.box --force
+~~~~
