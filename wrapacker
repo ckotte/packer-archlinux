@@ -194,7 +194,7 @@ country=''
 provider=''
 dry_run=false
 timeout=''
-skip_write_zeros=false
+skip_write_zeros='yes'
 btrfs_layout='simple'
 luks='yes'
 grub_passphrase='yes'
@@ -229,7 +229,7 @@ while [[ $1 != '' ]]; do
       timeout=${1#*=}
       ;;
     -w | --skip-write-zeros)
-      skip_write_zeros=true
+      skip_write_zeros=$(echo "$2" | tr '[:lower:]' '[:upper:]')
       ;;
     -b | --btrfs-layout)
       btrfs_layout=$(echo "$2" | tr '[:lower:]' '[:upper:]')
@@ -351,10 +351,22 @@ else
   SSH_TIMEOUT='20m'
 fi
 
-if [[ $skip_write_zeros = true ]]; then
-  WRITE_ZEROS="false"
+if [[ $skip_write_zeros ]]; then
+  case $(echo "$skip_write_zeros" | tr '[:upper:]' '[:lower:]') in
+    yes)
+      WRITE_ZEROS='no'
+      ;;
+    no)
+      WRITE_ZEROS='yes'
+      ;;
+    *)
+      warn "unknown option -- ${skip_write_zeros}"
+      usage
+      exit 1
+      ;;
+  esac
 else
-  WRITE_ZEROS="true"
+  WRITE_ZEROS='no'
 fi
 
 if [[ $btrfs_layout ]]; then
