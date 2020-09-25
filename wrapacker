@@ -110,74 +110,75 @@ print_valid_on_error_actions() {
 }
 
 # print this script's help message to stdout
+# TODO: fix intendation of EOF output -> remove leading spaces
 help() {
   cat <<-EOF
 
-  NAME
-       wrapacker -- wrap packer to build arch with custom mirror settings
+NAME
+    wrapacker -- wrap packer to build arch with custom mirror settings
 
-  SYNOPSIS
-       wrapacker [options...] [template]
+SYNOPSIS
+    wrapacker [options...] [template]
 
-  DESCRIPTION
+DESCRIPTION
 
-       wrapacker will automatically ensure the latest ISO download URL and
-       will optionally use a mirror from the provided country in order to
-       build an Arch Linux box using Packer.
+    wrapacker will automatically ensure the latest ISO download URL and
+    will optionally use a mirror from the provided country in order to
+    build an Arch Linux box using Packer.
 
-  OPTIONS
-       -c, --country=COUNTRY
-              the country code to download from;
-              defaults to the kernel.org US mirror
+OPTIONS
+    -c, --country=COUNTRY
+        the country code to download from;
+        defaults to the kernel.org US mirror
 
-       -p, --provider=PROVIDER
-              the packer provider to build with;
-              defaults to virtualbox
+    -p, --provider=PROVIDER
+        the packer provider to build with;
+        defaults to virtualbox
 
-       -t, --timeout=TIMEOUT
-              sets the amount of time packer will wait for trying ssh login;
-              defaults to 20m
+    -t, --timeout=TIMEOUT
+        sets the amount of time packer will wait for trying ssh login;
+        defaults to 20m
 
-       -w, --skip-write-zeros
-              don't inflate the disk to improve virtual disk compaction
-              defaults to yes
+    -w, --skip-write-zeros
+        don't inflate the disk to improve virtual disk compaction
+        defaults to yes
 
-       -b, --btrfs-layout=LAYOUT
-              the btrfs layout that should be used
-              defaults to simple
+    -b, --btrfs-layout=LAYOUT
+        the btrfs layout that should be used
+        defaults to simple
 
-       -l, --luks=yes|no
-              encrypt the partitions with LUKS (Linux Unified Key Setup)
-              defaults to yes
+    -l, --luks=yes|no
+        encrypt the partitions with LUKS (Linux Unified Key Setup)
+        defaults to yes
 
-       -g, --grub-passphrase=yes|no
-              required to enter a grub passphrase if using luks; a patched grub and the keyfile is used if set to no
-              defaults to yes
+    -g, --grub-passphrase=yes|no
+        required to enter a grub passphrase if using luks; a patched grub and the keyfile is used if set to no
+        defaults to yes
 
-       -o, --on-error=ACTION
-              error handling if the build fails;
-              defaults to cleanup
+    -o, --on-error=ACTION
+        error handling if the build fails;
+        defaults to cleanup
 
-       -f, --force
-              force a build to continue if artifacts exist; deletes existing artifacts
+    -f, --force
+        force a build to continue if artifacts exist; deletes existing artifacts
 
-       -d, --dry-run
-              do not actually perform the build, just show what would run
+    -d, --dry-run
+        do not actually perform the build, just show what would run
 
-       -h, --help
-              view this help message
+    -h, --help
+        view this help message
 
-       -e, --headless
-              do not run the build in the GUI
-              only works with --provider=virtualbox
+    -e, --headless
+        do not run the build in the GUI
+        only works with --provider=virtualbox
 
-  TEMPLATE
-       Name of the packer json template to use
-       defaults to arch-template.json
+TEMPLATE
+    Name of the packer json template to use
+    defaults to arch-template.json
 
-  AUTHOR
-       Aaron Bull Schaefer <aaron@elasticdog.com>
-       Christian Kotte <christian.kotte@gmx.de>
+AUTHOR
+    Aaron Bull Schaefer <aaron@elasticdog.com>
+    Christian Kotte <christian.kotte@gmx.de>
 
 EOF
 }
