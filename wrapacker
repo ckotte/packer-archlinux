@@ -172,6 +172,7 @@ help() {
 
   AUTHOR
        Aaron Bull Schaefer <aaron@elasticdog.com>
+       Christian Kotte <christian.kotte@gmx.de>
 
 EOF
 }
