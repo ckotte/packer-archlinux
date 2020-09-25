@@ -487,9 +487,9 @@ echo ">>>> install-base.sh: Completing installation.."
 /usr/bin/sleep 3
 /usr/bin/umount -R ${TARGET_DIR}
 /usr/bin/swapoff -a
-/usr/bin/systemctl reboot
 if [[ $LUKS_ENCRYPTION == "yes" ]] && [[ ${GRUB_PASSPHRASE} == "yes" ]]; then
   echo ">>>> install-base.sh: Basic installation complete. Type in grub passphrase to continue with $PACKER_BUILDER_TYPE configuration."
 else
   echo ">>>> install-base.sh: Basic installation complete. Continueing with $PACKER_BUILDER_TYPE configuration.."
 fi
+/usr/bin/systemctl reboot
