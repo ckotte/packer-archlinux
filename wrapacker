@@ -25,6 +25,8 @@ fi
 
 VALID_TIME_UNITS=(ns us ms s m h)
 
+VALID_BTRFS_LAYOUTS=(current simple archlinux opensuse)
+
 ##### Functions
 
 # print a message to stderr
@@ -63,7 +65,7 @@ validate_country() {
 # print this script's usage message to stderr
 usage() {
   cat <<-EOF >&2
-  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-o ON-ERROR ACTION] [-f] [-d] [-h]
+  usage: wrapacker [-c COUNTRY] [-p PROVIDER] [-t TIMEOUT] [-w] [-b BTRFS LAYOUT] [-o ON-ERROR ACTION] [-f] [-d] [-h]
 EOF
 }
 
@@ -88,6 +90,14 @@ print_valid_time_units() {
   printf '\n*** VALID TIME UNITS ***\n\n' >&2
   for units in "${VALID_TIME_UNITS[@]}"; do
     printf '%-6s\n' "$units"
+  done | column >&2
+}
+
+# print the list of valid Btrfs layouts
+print_valid_btrfs_layouts() {
+  printf '\n*** VALID BTRFS LAYOUTS ***\n\n' >&2
+  for layout in "${VALID_BTRFS_LAYOUTS[@]}"; do
+    printf '%-6s\n' "$layout"
   done | column >&2
 }
 
@@ -131,6 +141,10 @@ help() {
        -w, --skip-write-zeros
               don't inflate the disk to improve virtual disk compaction
 
+       -b, --btrfs-layout=LAYOUT
+              the btrfs layout that should be used
+              defaults to simple
+
        -o, --on-error=ACTION
               error handling if the build fails;
               defaults to cleanup
@@ -168,6 +182,7 @@ provider=''
 dry_run=false
 timeout=''
 skip_write_zeros=false
+btrfs_layout='current'
 on_error=''
 force=false
 headless=false
@@ -199,6 +214,13 @@ while [[ $1 != '' ]]; do
     -w | --skip-write-zeros)
       skip_write_zeros=true
       ;;
+    -b | --btrfs-layout)
+      btrfs_layout=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      shift
+      ;;
+    --btrfs-layout=*)
+      btrfs_layout=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      ;;
     -o | --on-error)
       on_error=$2
       shift
@@ -217,6 +239,7 @@ while [[ $1 != '' ]]; do
       print_valid_countries
       print_valid_providers
       print_valid_time_units
+      print_valid_btrfs_layouts
       print_valid_on_error_actions
       exit 0
       ;;
@@ -300,6 +323,31 @@ else
   WRITE_ZEROS="true"
 fi
 
+if [[ $btrfs_layout ]]; then
+  case $(echo "$btrfs_layout" | tr '[:upper:]' '[:lower:]') in
+    current)
+      BTRFS_LAYOUT='current'
+      ;;
+    simple)
+      BTRFS_LAYOUT='simple'
+      ;;
+    enhanced)
+      BTRFS_LAYOUT='enhanced'
+      ;;
+    opensuse)
+      BTRFS_LAYOUT='opensuse'
+      ;;
+    *)
+      warn "unknown btrfs layout -- ${btrfs_layout}"
+      usage
+      print_valid_btrfs_layouts
+      exit 1
+      ;;
+  esac
+else
+  BTRFS_LAYOUT='simple'
+fi
+
 if [[ $on_error ]]; then
   case $(echo "$on_error" | tr '[:upper:]' '[:lower:]') in
     cleanup)
@@ -333,6 +381,7 @@ cat <<-EOF
     -var "country=$country" \\
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
+    -var "btrfs_layout=$BTRFS_LAYOUT" \\
     -on-error=$ON_ERROR \\
     -force \\
     arch-template.json
@@ -347,6 +396,7 @@ cat <<-EOF
     -var "country=$country" \\
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
+    -var "btrfs_layout=$BTRFS_LAYOUT" \\
     -on-error=$ON_ERROR \\
     arch-template.json
 EOF
@@ -361,6 +411,7 @@ else
       -var "country=$country" \
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
+      -var "btrfs_layout=$BTRFS_LAYOUT" \
       -on-error=$ON_ERROR \
       -force \
       arch-template.json
@@ -373,6 +424,7 @@ else
       -var "country=$country" \
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
+      -var "btrfs_layout=$BTRFS_LAYOUT" \
       -on-error=$ON_ERROR \
       arch-template.json
   fi

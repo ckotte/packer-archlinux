@@ -27,6 +27,7 @@ DATA_SIZE="0"
 SWAP_NAME="cryptArchSwap"
 ROOT_NAME="cryptArchSystem"
 DATA_NAME="cryptData"
+BTRFS_LAYOUT=${BTRFS_LAYOUT:-current}
 TARGET_DIR='/mnt'
 COUNTRY=${COUNTRY:-US}
 MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
@@ -74,46 +75,180 @@ echo ">>>> install-base.sh: Mounting /dev/mapper/${ROOT_NAME} to ${TARGET_DIR}..
 /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
 
 echo ">>>> install-base.sh: Creating Btrfs subvolumes.."
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/@
-# don't create grub subvolumes
-# /usr/bin/mkdir -p ${TARGET_DIR}/@/boot/grub/
-# /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/i386-pc
-# /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/x86_64-efi
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var
+case "$BTRFS_LAYOUT" in
+  "current")
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/cache
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/log
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/tmp
+    /usr/bin/mkdir -p ${TARGET_DIR}/@var/lib
+    # default location for virtual machine images managed with systemd-nspawn
+    # /var/lib/machine subvolume is created by systemd automatically. Unfortunately, without CoW disabled
+    # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/machines
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib/libvirt
+    # default location for virtual machine images managed with libvirt
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
+    # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
+    /usr/bin/chmod 1777 ${TARGET_DIR}/@/var/tmp
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/.snapshots
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home/.snapshots
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/.snapshots
+    /usr/bin/chmod 750 ${TARGET_DIR}/@/.snapshots
+    /usr/bin/chmod 750 ${TARGET_DIR}/@/home/.snapshots
+    /usr/bin/chmod 750 ${TARGET_DIR}/@/var/.snapshots
+    ;;
+  "simple")
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
+    ;;
+  "archlinux")
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/boot/grub/
+    # don't create subvolume for Grub BIOS modules
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@boot-grub-i386-pc
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/x86_64-efi
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/cache
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/tmp
+    # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
+    /usr/bin/chmod 1777 ${TARGET_DIR}/@/var/tmp
+    # default location for virtual machine images managed with systemd-nspawn
+    # The /var/lib/machine subvolume is created automatically by systemd. Unfortunately, without CoW disabled
+    # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/machines
+    # default location for portable service images
+    # The /var/lib/portables subvolume is created automatically by systemd.
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/portables
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib/libvirt
+    # default location for virtual machine images managed with libvirt
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home-snapshots
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log-snapshots
+    # Subvolumes
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-cache
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-tmp
+    # # default location for virtual machine images managed with systemd-nspawn
+    # # The /var/lib/machine subvolume is created automatically by systemd. Unfortunately, without CoW disabled
+    # # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-machines
+    # # default location for portable service images
+    # # The /var/lib/portables subvolume is created automatically by systemd.
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-portables
+    # # default location for virtual machine images managed with libvirt
+    # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-lib-libvirt-images
+    ;;
+  "opensuse")
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
+    # Nested subvolumes of @
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/.snapshots
+    /usr/bin/mkdir ${TARGET_DIR}/@/.snapshots/1
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/.snapshots/1/snapshot
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/boot/grub/
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/i386-pc
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/x86_64-efi
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/opt
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/root
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/srv
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/tmp
+    /usr/bin/mkdir ${TARGET_DIR}/@/usr/
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/usr/local
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var
+    echo ">>>> install-base.sh: Configuring 'first root filesystem' snapshot.."
+    DATE=$(date +"%Y-%m-%d %H:%M:%S")
+    cat <<-EOF > "${TARGET_DIR}/@/.snapshots/1/info.xml"
+    <?xml version="1.0"?>
+    <snapshot>
+      <type>single</type>
+      <num>1</num>
+      <date>${DATE}</date>
+      <description>first root filesystem</description>
+    </snapshot>
+EOF
+    echo ">>>> install-base.sh: Setting 'first root filesystem' snapshot as the default snapshot.."
+    /usr/bin/btrfs subvolume set-default $(/usr/bin/btrfs subvolume list ${TARGET_DIR} | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') ${TARGET_DIR}
+    ;;
+  *)
+    echo ">>>> install-base.sh: Btrfs layout option not supported. Aborting script.."
+    exit 1
+    ;;
+esac
 
 echo ">>>> install-base.sh: Unmounting ${TARGET_DIR}.."
 /usr/bin/umount ${TARGET_DIR}
 
 echo ">>>> install-base.sh: Mounting Btrfs subvolumes to ${TARGET_DIR}.."
-/usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
-#/usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/boot/grub/i386-pc /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/boot/grub/i386-pc
-#/usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/boot/grub/x86_64-efi /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/sx86_64-efi
-#/usr/bin/mkdir ${TARGET_DIR}/home
-/usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/home /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/home
-#/usr/bin/mkdir ${TARGET_DIR}/var
-/usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/var /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var
-
-echo ">>>> install-base.sh: Creating nested Btrfs subvolumes.."
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/cache
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/log
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/tmp
-/usr/bin/mkdir -p ${TARGET_DIR}/var/lib
-# default location for virtual machine images managed with systemd-nspawn
-# /var/lib/machine subvolume is created by systemd automatically. Unfortunately, without CoW disabled
-# https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/lib/machines
-/usr/bin/mkdir -p ${TARGET_DIR}/var/lib/libvirt
-# default location for virtual machine images managed with libvirt
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/lib/libvirt/images
-# set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
-/usr/bin/chmod 1777 ${TARGET_DIR}/var/tmp
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/.snapshots
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/home/.snapshots
-/usr/bin/btrfs subvolume create ${TARGET_DIR}/var/.snapshots
-/usr/bin/chmod 750 ${TARGET_DIR}/.snapshots
-/usr/bin/chmod 750 ${TARGET_DIR}/home/.snapshots
-/usr/bin/chmod 750 ${TARGET_DIR}/var/.snapshots
+case "$BTRFS_LAYOUT" in
+  "current")
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
+    #/usr/bin/mkdir ${TARGET_DIR}/home
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/home /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/home
+    #/usr/bin/mkdir ${TARGET_DIR}/var
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/var /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var
+    ;;
+  "simple")
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
+    ;;
+  "archlinux")
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
+    /usr/bin/mkdir ${TARGET_DIR}/.snapshots
+    /usr/bin/chmod 0750 ${TARGET_DIR}/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/.snapshots
+    /usr/bin/mkdir ${TARGET_DIR}/home
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/home
+    # TODO: or create subvolume later for /home/<user> ??
+    /usr/bin/mkdir ${TARGET_DIR}/home/.snapshots
+    /usr/bin/chmod 0750 ${TARGET_DIR}/home/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@home-snapshots /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/home/.snapshots
+    /usr/bin/mkdir -p ${TARGET_DIR}/var/log
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/log
+    /usr/bin/mkdir ${TARGET_DIR}/var/log/.snapshots
+    /usr/bin/chmod 0750 ${TARGET_DIR}/var/log/.snapshots
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log-snapshots /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/log/.snapshots
+    # /usr/bin/mkdir -p ${TARGET_DIR}/var/cache
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-cache /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/cache
+    # /usr/bin/mkdir -p ${TARGET_DIR}/var/tmp
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-tmp /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/tmp
+    # # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
+    # /usr/bin/chmod 1777 ${TARGET_DIR}/var/tmp
+    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/machines
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-machines /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/lib/machines
+    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/portables
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-portables /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/lib/portables
+    # /usr/bin/mkdir -p ${TARGET_DIR}/var/lib/libvirt/images
+    # /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-lib-libvirt-images /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var/lib/libvirt/images
+    ;;
+  "opensuse")
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}
+    /usr/bin/mkdir ${TARGET_DIR}/.snapshots
+    /usr/bin/mkdir -p ${TARGET_DIR}/boot/grub/i386-pc
+    /usr/bin/mkdir -p ${TARGET_DIR}/boot/grub/x86_64-efi
+    /usr/bin/mkdir ${TARGET_DIR}/home
+    /usr/bin/mkdir ${TARGET_DIR}/opt
+    /usr/bin/mkdir ${TARGET_DIR}/root
+    /usr/bin/chmod 750 ${TARGET_DIR}/root
+    /usr/bin/mkdir ${TARGET_DIR}/srv
+    /usr/bin/mkdir ${TARGET_DIR}/tmp
+    /usr/bin/mkdir -p ${TARGET_DIR}/usr/local
+    /usr/bin/mkdir ${TARGET_DIR}/var
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/.snapshots -o subvol=@/.snapshots
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/boot/grub/i386-pc -o subvol=@/boot/grub/i386-pc
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/boot/grub/x86_64-efi -o subvol=@/boot/grub/x86_64-efi
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/home -o subvol=@/home
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/opt -o subvol=@/opt
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/root -o subvol=@/root
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/srv -o subvol=@/srv
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/tmp -o subvol=@/tmp
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/usr/local -o subvol=@/usr/local
+    /usr/bin/mount /dev/mapper/${ROOT_NAME} ${TARGET_DIR}/var -o subvol=@/var
+    ;;
+esac
 
 echo ">>>> install-base.sh: Disabling copy-on-write for /var Btrfs subvolumes.."
 /usr/bin/chattr +C ${TARGET_DIR}/var
@@ -141,6 +276,16 @@ curl -s "$MIRRORLIST" |  sed 's/^#Server/Server/' > /etc/pacman.d/mirrorlist
 echo ">>>> install-base.sh: Bootstrapping the base installation.."
 /usr/bin/pacstrap ${TARGET_DIR} base linux
 
+case "$BTRFS_LAYOUT" in
+  "opensuse")
+    # TODO: Need to install openSUSE-patched version of grub. Otherwise, grub cannot boot!
+    /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub
+    ;;
+  *)
+    echo ">>>> install-base.sh: Installing grub bootloader.."
+    /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm grub
+    ;;
+esac
 echo ">>>> install-base.sh: Installing basic packages.."
 # Need to install netctl as well: https://github.com/archlinux/arch-boxes/issues/70
 # Can be removed when Vagrant's Arch plugin will use systemd-networkd: https://github.com/hashicorp/vagrant/pull/11400

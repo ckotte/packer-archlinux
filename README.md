@@ -143,3 +143,15 @@ However, this can be done via another repository with an extra Vagrantfile and t
 vagrant box add arch ../packer-archlinux/output/packer_arch_luks_btrfs_virtualbox-2020.07.01.box --force
 ~~~~
 
+
+### Btrfs layouts
+
+The box can be built with different Btrfs layouts:
+* current: My current (messed up) layout. One subvolume with nested subvolumes. Note: Not recommended!
+* simple: Only one subvolume.
+* archlinux: Several subvolumes.
+* opensuse: openSUSE layout. Note: Cannot be booted because openSUSE-patched version of grub is needed.
+
+~~~~
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=current" -on-error=ask -force arch-template-luks-btrfs.json
+~~~~

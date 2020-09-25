@@ -5,6 +5,7 @@
         "ssh_timeout": "20m",
         "country": "US",
         "write_zeros": "true",
+        "btrfs_layout": "current",
         "headless": "false"
     },
     "builders": [
@@ -115,7 +116,7 @@
     "provisioners": [
         {
             "type": "shell",
-            "execute_command": "{{ .Vars }} COUNTRY={{ user `country` }} sudo -E -S bash '{{ .Path }}'",
+            "execute_command": "{{ .Vars }} COUNTRY={{ user `country` }} BTRFS_LAYOUT={{ user `btrfs_layout` }} sudo -E -S bash '{{ .Path }}'",
             "expect_disconnect": true,
             "script": "scripts/install-base-luks-btrfs.sh"
         },
