@@ -55,9 +55,15 @@ echo ">>>> install-base.sh: Creating partitions on ${DISK}.."
 /usr/bin/sgdisk --new=${DATA_PARTITION}:0:${DATA_SIZE} --typecode=1:8300 ${DISK}
 
 echo ">>>> install-base.sh: Initializing LUKS partitions.."
-echo -n "vagrant" | /usr/bin/cryptsetup luksFormat --type luks1 ${DISK}${SWAP_PARTITION} -
-echo -n "vagrant" | /usr/bin/cryptsetup luksFormat --type luks1 ${DISK}${ROOT_PARTITION} -
-echo -n "vagrant" | /usr/bin/cryptsetup luksFormat --type luks1 ${DISK}${DATA_PARTITION} -
+# grub decryption is very very slow in a VM with default settings for luksFormat and luksAddKey with grub-luks-keyfile
+# need to change --iter-time to speed up grub decryption
+# --iter-time 2000 luksFormat & --iter-time 2000 luksAddKey (default) = ~120s
+# --iter-time 1000 luksFormat & --iter-time 1 luksAddKey = ~30s
+# --iter-time 1 luksFormat & --iter-time 1 luksAddKey = ~1s
+# skip --iter-time and use the default settings when installing on a physical machine! this is most probably not secure
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksFormat --type luks1 ${DISK}${SWAP_PARTITION} -
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksFormat --type luks1 ${DISK}${ROOT_PARTITION} -
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksFormat --type luks1 ${DISK}${DATA_PARTITION} -
 
 echo ">>>> install-base.sh: Opening LUKS devices.."
 echo -n "vagrant" | /usr/bin/cryptsetup open ${DISK}${SWAP_PARTITION} ${SWAP_NAME} -
@@ -368,9 +374,11 @@ echo ">>>> install-base.sh: Creating keyfile.."
 /usr/bin/chmod 600 ${TARGET_DIR}/boot/initramfs-*
 
 echo ">>>> install-base.sh: Adding keyfile to LUKS devices.."
-echo -n "vagrant" | /usr/bin/cryptsetup luksAddKey ${DISK}${SWAP_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
-echo -n "vagrant" | /usr/bin/cryptsetup luksAddKey ${DISK}${ROOT_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
-echo -n "vagrant" | /usr/bin/cryptsetup luksAddKey ${DISK}${DATA_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
+# need to change --iter-time to speed up grub decryption; see luksFormat above for more details
+# skip --iter-time and use the default settings when installing on a physical machine! this is most probably not secure
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${SWAP_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${ROOT_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
+echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${DATA_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
 
 echo ">>>> install-base.sh: Configuring initramfs.."
 /usr/bin/sed -i "s=^MODULES\=.*=MODULES\=(loop)=" ${TARGET_DIR}/etc/mkinitcpio.conf
