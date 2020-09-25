@@ -107,31 +107,6 @@ For debugging purposes, execute:
 
 See the `--help` flag for additional details.
 
-Known Issues
-------------
-
-### VMware Tools
-
-The official VMware Tools do not currently support Arch Linux, and the
-[Open Virtual Machine Tools](https://github.com/vmware/open-vm-tools)
-(open-vm-tools) require extensive patching in order to compile correctly
-with a Linux 3.11 series kernel. So for the time being, I have not
-included support for the tools.
-
-No tools means that the shared folder feature will not work, and when you
-run `vagrant up` to launch a VM based on the VMware box, you will see the
-following error message:
-
-> The HGFS kernel module was not found on the running virtual machine.
-> This must be installed for shared folders to work properly. Please
-> install the VMware tools within the guest and try again. Note that
-> the VMware tools installation will succeed even if HGFS fails
-> to properly install. Carefully read the output of the VMware tools
-> installation to verify the HGFS kernel modules were installed properly.
-
-Note that _this issue does not apply to VirtualBox_, as their official
-guest additions work just fine.
-
 ### Vagrant Provisioners
 
 The box purposefully does not include Puppet, Chef or Ansible for automatic Vagrant
@@ -194,3 +169,6 @@ With wrapacker:
 ~~~~
 ./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~
+
+Known Issues
+------------
