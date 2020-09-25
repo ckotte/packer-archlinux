@@ -117,7 +117,7 @@
             "type": "shell",
             "execute_command": "{{ .Vars }} COUNTRY={{ user `country` }} sudo -E -S bash '{{ .Path }}'",
             "expect_disconnect": true,
-            "script": "scripts/install-base-custom.sh"
+            "script": "scripts/install-base-luks-btrfs.sh"
         },
         {
             "only": ["parallels-iso"],
