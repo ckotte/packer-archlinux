@@ -18,7 +18,7 @@
             "iso_url": "{{ user `iso_url` }}",
             "iso_checksum": "file:{{ user `iso_checksum_url` }}",
             "http_directory": "srv",
-            "boot_wait": "30s",
+            "boot_wait": "40s",
             "boot_command": [
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/bash ./enable-ssh.sh<enter>"
@@ -39,7 +39,7 @@
             "guest_os_type": "ArchLinux_64",
             "guest_additions_mode": "disable",
             "http_directory": "srv",
-            "boot_wait": "30s",
+            "boot_wait": "40s",
             "boot_command": [
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/bash ./enable-ssh.sh<enter>"
@@ -74,7 +74,7 @@
             "iso_url": "{{ user `iso_url` }}",
             "iso_checksum": "file:{{ user `iso_checksum_url` }}",
             "http_directory": "srv",
-            "boot_wait": "30s",
+            "boot_wait": "40s",
             "boot_command": [
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/bash ./enable-ssh.sh<enter>"
@@ -93,7 +93,7 @@
             "iso_url": "{{ user `iso_url` }}",
             "iso_checksum": "file:{{ user `iso_checksum_url` }}",
             "http_directory": "srv",
-            "boot_wait": "30s",
+            "boot_wait": "40s",
             "boot_command": [
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/bash ./enable-ssh.sh<enter>"
