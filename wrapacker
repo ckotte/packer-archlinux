@@ -140,6 +140,7 @@ help() {
 
        -w, --skip-write-zeros
               don't inflate the disk to improve virtual disk compaction
+              defaults to yes
 
        -b, --btrfs-layout=LAYOUT
               the btrfs layout that should be used
