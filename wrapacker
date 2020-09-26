@@ -372,26 +372,14 @@ else
 fi
 
 if [[ $btrfs_layout ]]; then
-  case $(echo "$btrfs_layout" | tr '[:upper:]' '[:lower:]') in
-    current)
-      BTRFS_LAYOUT='current'
-      ;;
-    simple)
-      BTRFS_LAYOUT='simple'
-      ;;
-    enhanced)
-      BTRFS_LAYOUT='enhanced'
-      ;;
-    opensuse)
-      BTRFS_LAYOUT='opensuse'
-      ;;
-    *)
-      warn "unknown btrfs layout -- ${btrfs_layout}"
-      usage
-      print_valid_btrfs_layouts
-      exit 1
-      ;;
-  esac
+  if [[ " $VALID_BTRFS_LAYOUTS " =~ " $btrfs_layout " ]]; then
+    BTRFS_LAYOUT=${btrfs_layout}
+  else
+    warn "unknown btrfs layout -- ${btrfs_layout}"
+    usage
+    print_valid_btrfs_layouts
+    exit 1
+  fi
 else
   BTRFS_LAYOUT='simple'
 fi
