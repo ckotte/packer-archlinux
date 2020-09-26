@@ -106,30 +106,6 @@ echo ">>>> install-base.sh: Mounting ${DATA_DEVICE} to ${DATA_TARGET_DIR}.."
 
 echo ">>>> install-base.sh: Creating Btrfs subvolumes.."
 case "$BTRFS_LAYOUT" in
-  "current")
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/cache
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/log
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/tmp
-    /usr/bin/mkdir -p ${TARGET_DIR}/@var/lib
-    # default location for virtual machine images managed with systemd-nspawn
-    # /var/lib/machine subvolume is created by systemd automatically. Unfortunately, without CoW disabled
-    # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/machines
-    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib/libvirt
-    # default location for virtual machine images managed with libvirt
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
-    # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
-    /usr/bin/chmod 1777 ${TARGET_DIR}/@/var/tmp
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/.snapshots
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/home/.snapshots
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/.snapshots
-    /usr/bin/chmod 750 ${TARGET_DIR}/@/.snapshots
-    /usr/bin/chmod 750 ${TARGET_DIR}/@/home/.snapshots
-    /usr/bin/chmod 750 ${TARGET_DIR}/@/var/.snapshots
-    ;;
   "simple")
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@
     /usr/bin/btrfs subvolume create ${DATA_TARGET_DIR}/@
@@ -212,11 +188,6 @@ echo ">>>> install-base.sh: Unmounting ${DATA_TARGET_DIR}.."
 
 echo ">>>> install-base.sh: Mounting Btrfs subvolumes to ${TARGET_DIR}.."
 case "$BTRFS_LAYOUT" in
-  "current")
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/home ${ROOT_DEVICE} ${TARGET_DIR}/home
-    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/var ${ROOT_DEVICE} ${TARGET_DIR}/var
-    ;;
   "simple")
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
     ;;
@@ -269,7 +240,7 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/chattr +C ${TARGET_DIR}/var/lib/portables
     /usr/bin/chattr +C ${TARGET_DIR}/var/lib/libvirt/images
     ;;
-  "current"|"simple"|"opensuse")
+"simple"|"opensuse")
     echo ">>>> install-base.sh: Disabling copy-on-write for /var .."
     /usr/bin/chattr -R +C ${TARGET_DIR}/var
     ;;

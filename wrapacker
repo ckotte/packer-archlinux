@@ -25,7 +25,7 @@ fi
 
 VALID_TIME_UNITS=(ns us ms s m h)
 
-VALID_BTRFS_LAYOUTS=(current simple enhanced opensuse)
+VALID_BTRFS_LAYOUTS=(simple enhanced opensuse)
 
 ##### Functions
 
