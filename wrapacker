@@ -191,17 +191,18 @@ for cmd in {awk,curl,sed,tr}; do
   command -v $cmd > /dev/null || die "required command \"$cmd\" was not found"
 done
 
-# reset all variables that might be set
-country=''
-provider=''
+# specify default values / reset all variables that might be set
+MIRROR='https://mirrors.kernel.org/archlinux'
+country='US'
+provider='virtualbox-iso'
 dry_run=false
-timeout=''
+timeout='20m'
 skip_write_zeros='yes'
 btrfs_layout='simple'
 luks='yes'
 grub_passphrase='yes'
 install_type=''
-on_error=''
+on_error='cleanup'
 force=false
 headless=false
 template='arch-template.json'
@@ -296,151 +297,119 @@ while [[ $1 != '' ]]; do
   shift
 done
 
-if [[ $provider ]]; then
-  case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
-    parallels | parallels-iso)
-      PACKER_PROVIDER='parallels-iso'
-      ;;
-    virtualbox | virtualbox-iso)
-      PACKER_PROVIDER='virtualbox-iso'
-      ;;
-    vmware | vmware-iso)
-      PACKER_PROVIDER='vmware-iso'
-      ;;
-    libvirt | qemu)
-      PACKER_PROVIDER='qemu'
-      ;;
-    *)
-      warn "unknown provider -- ${provider}"
-      usage
-      print_valid_providers
-      exit 1
-      ;;
-  esac
-else
-  PACKER_PROVIDER='virtualbox-iso'
-fi
 
-if [[ $country ]]; then
-  if validate_country "$country"; then
-    MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
-    MIRROR=$(curl -s "$MIRRORLIST" | awk '/#Server/{ print $3; exit }' | sed 's|/$repo.*||')
-  else
-    warn 'INVALID COUNTRY SPECIFIED - %s' "$country"
+case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
+  parallels | parallels-iso)
+    PACKER_PROVIDER='parallels-iso'
+    ;;
+  virtualbox | virtualbox-iso)
+    PACKER_PROVIDER='virtualbox-iso'
+    ;;
+  vmware | vmware-iso)
+    PACKER_PROVIDER='vmware-iso'
+    ;;
+  libvirt | qemu)
+    PACKER_PROVIDER='qemu'
+    ;;
+  *)
+    warn "unknown provider -- ${provider}"
     usage
-    print_valid_countries
+    print_valid_providers
     exit 1
-  fi
+    ;;
+esac
+
+if validate_country "$country"; then
+  MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
+  MIRROR=$(curl -s "$MIRRORLIST" | awk '/#Server/{ print $3; exit }' | sed 's|/$repo.*||')
 else
-  MIRROR='https://mirrors.kernel.org/archlinux'
-  country='US'
+  warn 'INVALID COUNTRY SPECIFIED - %s' "$country"
+  usage
+  print_valid_countries
+  exit 1
 fi
 
 ISO_CHECKSUM_URL="${MIRROR}/iso/latest/sha1sums.txt"
 ISO_NAME=$(curl -sL "$ISO_CHECKSUM_URL" | awk '/-x86_64.iso/{ print $2 }')
 ISO_URL="${MIRROR}/iso/latest/${ISO_NAME}"
 
-if [[ $timeout ]]; then
-  if [[ "$timeout" =~ ^[0-9]+(ns|us|ms|s|m|h)$ ]]; then
-    SSH_TIMEOUT=$timeout
-  else
-    warn 'INVALID TIME UNITS SPECIFIED or MISSING UNIT - %s' "$timeout"
+if [[ "$timeout" =~ ^[0-9]+(ns|us|ms|s|m|h)$ ]]; then
+  SSH_TIMEOUT=$timeout
+else
+  warn 'INVALID TIME UNITS SPECIFIED or MISSING UNIT - %s' "$timeout"
+  usage
+  print_valid_time_units
+  exit 1
+fi
+
+case $(echo "$skip_write_zeros" | tr '[:upper:]' '[:lower:]') in
+  yes)
+    WRITE_ZEROS='no'
+    ;;
+  no)
+    WRITE_ZEROS='yes'
+    ;;
+  *)
+    warn "unknown option -- ${skip_write_zeros}"
     usage
-    print_valid_time_units
     exit 1
-  fi
+    ;;
+esac
+
+if [[ " $VALID_BTRFS_LAYOUTS " =~ " $btrfs_layout " ]]; then
+  BTRFS_LAYOUT=${btrfs_layout}
 else
-  SSH_TIMEOUT='20m'
+  warn "unknown btrfs layout -- ${btrfs_layout}"
+  usage
+  print_valid_btrfs_layouts
+  exit 1
 fi
 
-if [[ $skip_write_zeros ]]; then
-  case $(echo "$skip_write_zeros" | tr '[:upper:]' '[:lower:]') in
-    yes)
-      WRITE_ZEROS='no'
-      ;;
-    no)
-      WRITE_ZEROS='yes'
-      ;;
-    *)
-      warn "unknown option -- ${skip_write_zeros}"
-      usage
-      exit 1
-      ;;
-  esac
-else
-  WRITE_ZEROS='no'
-fi
-
-if [[ $btrfs_layout ]]; then
-  if [[ " $VALID_BTRFS_LAYOUTS " =~ " $btrfs_layout " ]]; then
-    BTRFS_LAYOUT=${btrfs_layout}
-  else
-    warn "unknown btrfs layout -- ${btrfs_layout}"
+case $(echo "$luks" | tr '[:upper:]' '[:lower:]') in
+  yes)
+    LUKS='yes'
+    ;;
+  no)
+    LUKS='no'
+    ;;
+  *)
+    warn "unknown option -- ${luks}"
     usage
-    print_valid_btrfs_layouts
     exit 1
-  fi
-else
-  BTRFS_LAYOUT='simple'
-fi
+    ;;
+esac
 
-if [[ $luks ]]; then
-  case $(echo "$luks" | tr '[:upper:]' '[:lower:]') in
-    yes)
-      LUKS='yes'
-      ;;
-    no)
-      LUKS='no'
-      ;;
-    *)
-      warn "unknown option -- ${luks}"
-      usage
-      exit 1
-      ;;
-  esac
-else
-  LUKS='yes'
-fi
+case $(echo "$grub_passphrase" | tr '[:upper:]' '[:lower:]') in
+  yes)
+    GRUB_PASSPHRASE='yes'
+    ;;
+  no)
+    GRUB_PASSPHRASE='no'
+    ;;
+  *)
+    warn "unknown option -- ${grub_passphrase}"
+    usage
+    exit 1
+    ;;
+esac
 
-if [[ $grub_passphrase ]]; then
-  case $(echo "$grub_passphrase" | tr '[:upper:]' '[:lower:]') in
-    yes)
-      GRUB_PASSPHRASE='yes'
-      ;;
-    no)
-      GRUB_PASSPHRASE='no'
-      ;;
-    *)
-      warn "unknown option -- ${grub_passphrase}"
-      usage
-      exit 1
-      ;;
-  esac
-else
-  GRUB_PASSPHRASE='yes'
-fi
-
-if [[ $on_error ]]; then
-  case $(echo "$on_error" | tr '[:upper:]' '[:lower:]') in
-    cleanup)
-      ON_ERROR='cleanup'
-      ;;
-    abort)
-      ON_ERROR='abort'
-      ;;
-    ask)
-      ON_ERROR='ask'
-      ;;
-    *)
-      warn "unknown on-error action -- ${on_error}"
-      usage
-      print_valid_on_error_actions
-      exit 1
-      ;;
-  esac
-else
-  ON_ERROR='cleanup'
-fi
+case $(echo "$on_error" | tr '[:upper:]' '[:lower:]') in
+  cleanup)
+    ON_ERROR='cleanup'
+    ;;
+  abort)
+    ON_ERROR='abort'
+    ;;
+  ask)
+    ON_ERROR='ask'
+    ;;
+  *)
+    warn "unknown on-error action -- ${on_error}"
+    usage
+    print_valid_on_error_actions
+    exit 1
+    ;;
+esac
 
 if [[ $LUKS == 'yes' ]]; then
   install_type='luks_'
