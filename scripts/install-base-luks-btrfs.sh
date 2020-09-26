@@ -214,9 +214,7 @@ echo ">>>> install-base.sh: Mounting Btrfs subvolumes to ${TARGET_DIR}.."
 case "$BTRFS_LAYOUT" in
   "current")
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@ ${ROOT_DEVICE} ${TARGET_DIR}
-    #/usr/bin/mkdir ${TARGET_DIR}/home
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/home ${ROOT_DEVICE} ${TARGET_DIR}/home
-    #/usr/bin/mkdir ${TARGET_DIR}/var
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@/var ${ROOT_DEVICE} ${TARGET_DIR}/var
     ;;
   "simple")
