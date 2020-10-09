@@ -138,7 +138,7 @@ OPTIONS
         sets the amount of time packer will wait for trying ssh login;
         defaults to 20m
 
-    -w, --skip-write-zeros
+    -w, --skip-write-zeros=yes|no
         don't inflate the disk to improve virtual disk compaction
         defaults to yes
 
@@ -232,6 +232,10 @@ while [[ $1 != '' ]]; do
       ;;
     -w | --skip-write-zeros)
       skip_write_zeros=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      shift
+      ;;
+    --skip-write-zeros=*)
+      skip_write_zeros=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
       ;;
     -b | --btrfs-layout)
       btrfs_layout=$(echo "$2" | tr '[:lower:]' '[:upper:]')
