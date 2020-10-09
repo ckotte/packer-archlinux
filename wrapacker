@@ -138,9 +138,9 @@ OPTIONS
         sets the amount of time packer will wait for trying ssh login;
         defaults to 20m
 
-    -w, --skip-write-zeros=yes|no
-        don't inflate the disk to improve virtual disk compaction
-        defaults to yes
+    -w, --write-zeros=yes|no
+        inflate the disk to improve virtual disk compaction
+        defaults to no
 
     -b, --btrfs-layout=LAYOUT
         the btrfs layout that should be used
@@ -196,7 +196,7 @@ country='US'
 provider='virtualbox-iso'
 dry_run=false
 timeout='20m'
-skip_write_zeros='yes'
+write_zeros='no'
 btrfs_layout='simple'
 luks='yes'
 grub_passphrase='yes'
@@ -230,12 +230,12 @@ while [[ $1 != '' ]]; do
     --timeout=*)
       timeout=${1#*=}
       ;;
-    -w | --skip-write-zeros)
-      skip_write_zeros=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+    -w | --write-zeros)
+      write_zeros=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       ;;
-    --skip-write-zeros=*)
-      skip_write_zeros=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
+    --write-zeros=*)
+      write_zeros=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
       ;;
     -b | --btrfs-layout)
       btrfs_layout=$(echo "$2" | tr '[:upper:]' '[:lower:]')
@@ -345,15 +345,15 @@ else
   exit 1
 fi
 
-case $(echo "$skip_write_zeros" | tr '[:upper:]' '[:lower:]') in
+case $(echo "$write_zeros" | tr '[:upper:]' '[:lower:]') in
   yes)
-    WRITE_ZEROS='no'
-    ;;
-  no)
     WRITE_ZEROS='yes'
     ;;
+  no)
+    WRITE_ZEROS='no'
+    ;;
   *)
-    warn "unknown option -- ${skip_write_zeros}"
+    warn "unknown option -- ${write_zeros}"
     usage
     exit 1
     ;;
