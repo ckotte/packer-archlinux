@@ -345,7 +345,7 @@ else
   exit 1
 fi
 
-case $(echo "$write_zeros" | tr '[:upper:]' '[:lower:]') in
+case $write_zeros in
   yes)
     WRITE_ZEROS='yes'
     ;;
@@ -368,7 +368,7 @@ else
   exit 1
 fi
 
-case $(echo "$luks" | tr '[:upper:]' '[:lower:]') in
+case $luks in
   yes)
     LUKS='yes'
     ;;
@@ -382,7 +382,7 @@ case $(echo "$luks" | tr '[:upper:]' '[:lower:]') in
     ;;
 esac
 
-case $(echo "$grub_passphrase" | tr '[:upper:]' '[:lower:]') in
+case $grub_passphrase in
   yes)
     GRUB_PASSPHRASE='yes'
     ;;
