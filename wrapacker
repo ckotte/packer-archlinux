@@ -231,32 +231,32 @@ while [[ $1 != '' ]]; do
       timeout=${1#*=}
       ;;
     -w | --skip-write-zeros)
-      skip_write_zeros=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      skip_write_zeros=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       ;;
     --skip-write-zeros=*)
-      skip_write_zeros=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      skip_write_zeros=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
       ;;
     -b | --btrfs-layout)
-      btrfs_layout=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      btrfs_layout=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       ;;
     --btrfs-layout=*)
-      btrfs_layout=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      btrfs_layout=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
       ;;
     -l | --luks)
-      luks=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      luks=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       ;;
     --luks=*)
-      luks=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      luks=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
       ;;
     -g | --grub-passphrase)
-      grub_passphrase=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+      grub_passphrase=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       ;;
     --grub-passphrase=*)
-      grub_passphrase=$(echo "${1#*=}" | tr '[:lower:]' '[:upper:]')
+      grub_passphrase=$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')
       ;;
     -o | --on-error)
       on_error=$2
