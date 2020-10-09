@@ -110,7 +110,6 @@ print_valid_on_error_actions() {
 }
 
 # print this script's help message to stdout
-# TODO: fix intendation of EOF output -> remove leading spaces
 help() {
   cat <<-EOF
 
