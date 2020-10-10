@@ -365,6 +365,11 @@ EOF
   echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${SWAP_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
   echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${ROOT_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
   echo -n "vagrant" | /usr/bin/cryptsetup --iter-time 1 luksAddKey ${DISK}${DATA_PARTITION} ${TARGET_DIR}/root/crypt_keyfile.bin -
+
+  echo ">>>> install-base.sh: Backing up LUKS headers.."
+  # https://gitlab.com/cryptsetup/cryptsetup/-/wikis/FrequentlyAskedQuestions#6-backup-and-data-recovery
+  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${ROOT_PARTITION} --header-backup-file /root/${DISK}${ROOT_PARTITION}-luksHeaderBackup.img
+  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${DATA_PARTITION} --header-backup-file /root/${DISK}${DATA_PARTITION}-luksHeaderBackup.img
 fi
 
 echo ">>>> install-base.sh: Configuring initramfs.."
