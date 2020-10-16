@@ -368,8 +368,8 @@ EOF
 
   echo ">>>> install-base.sh: Backing up LUKS headers.."
   # https://gitlab.com/cryptsetup/cryptsetup/-/wikis/FrequentlyAskedQuestions#6-backup-and-data-recovery
-  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${ROOT_PARTITION} --header-backup-file /root/${DISK}${ROOT_PARTITION}-luksHeaderBackup.img
-  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${DATA_PARTITION} --header-backup-file /root/${DISK}${DATA_PARTITION}-luksHeaderBackup.img
+  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${ROOT_PARTITION} --header-backup-file /root/${ROOT_NAME}-luksHeaderBackup.img
+  /usr/bin/cryptsetup luksHeaderBackup ${DISK}${DATA_PARTITION} --header-backup-file /root/${DATA_NAME}-luksHeaderBackup.img
 fi
 
 echo ">>>> install-base.sh: Configuring initramfs.."
