@@ -60,12 +60,6 @@
                 "{{.Name}}",
                 "--firmware",
                 "efi"
-              ],
-              [
-                "modifyvm",
-                "{{.Name}}",
-                "--audioout",
-                "on"
               ]
             ],
             "post_shutdown_delay": "120s",
