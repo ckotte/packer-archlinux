@@ -6,3 +6,6 @@ echo ">>>> install-qemu.sh: Installing QEMU Guest Agent.."
 
 echo ">>>> install-qemu.sh: Enabling QEMU Guest Agent service.."
 /usr/bin/systemctl enable qemu-ga.service
+
+echo ">>>> install-qemu.sh: Installing nfs-utils.."
+/usr/bin/pacman -S --noconfirm nfs-utils
