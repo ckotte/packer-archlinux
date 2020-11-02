@@ -116,11 +116,6 @@ case "$BTRFS_LAYOUT" in
     # don't create subvolume for Grub BIOS modules
     # /usr/bin/btrfs subvolume create ${TARGET_DIR}/@boot-grub-i386-pc
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/boot/grub/x86_64-efi
-    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/cache
-    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/tmp
-    # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
-    /usr/bin/chmod 1777 ${TARGET_DIR}/@/var/tmp
     /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib
     # default location for virtual machine images managed with systemd-nspawn
     # The /var/lib/machine subvolume is created automatically by systemd. Unfortunately, without CoW disabled
@@ -133,7 +128,10 @@ case "$BTRFS_LAYOUT" in
     # default location for virtual machine images managed with libvirt
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/libvirt/images
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@home
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-cache
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-log
+    # create /var/cache and /var/tmp as subvolumes be able to start all services when booting into snapshots of /
+    /usr/bin/btrfs subvolume create ${TARGET_DIR}/@var-tmp
     /usr/bin/mkdir ${TARGET_DIR}/@snapshots
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/root
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@snapshots/home
@@ -201,11 +199,17 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/mkdir ${TARGET_DIR}/home/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/home/.snapshots
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/home ${ROOT_DEVICE} ${TARGET_DIR}/home/.snapshots
+    /usr/bin/mkdir -p ${TARGET_DIR}/var/cache
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-cache ${ROOT_DEVICE} ${TARGET_DIR}/var/cache
     /usr/bin/mkdir -p ${TARGET_DIR}/var/log
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log
     /usr/bin/mkdir ${TARGET_DIR}/var/log/.snapshots
     /usr/bin/chmod 0750 ${TARGET_DIR}/var/log/.snapshots
     /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@snapshots/var-log ${ROOT_DEVICE} ${TARGET_DIR}/var/log/.snapshots
+    /usr/bin/mkdir -p ${TARGET_DIR}/var/tmp
+    # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
+    /usr/bin/chmod 1777 ${TARGET_DIR}/var/tmp
+    /usr/bin/mount -o compress=lzo,discard,noatime,nodiratime,subvol=@var-tmp ${ROOT_DEVICE} ${TARGET_DIR}/var/tmp
     ;;
   "opensuse")
     /usr/bin/mount ${ROOT_DEVICE} ${TARGET_DIR}
