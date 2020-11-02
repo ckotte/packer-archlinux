@@ -121,10 +121,10 @@ case "$BTRFS_LAYOUT" in
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/tmp
     # set sticky bit (https://www.thegeekdiary.com/unix-linux-what-is-the-correct-permission-of-tmp-and-vartmp-directories/)
     /usr/bin/chmod 1777 ${TARGET_DIR}/@/var/tmp
+    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib
     # default location for virtual machine images managed with systemd-nspawn
     # The /var/lib/machine subvolume is created automatically by systemd. Unfortunately, without CoW disabled
     # https://cgit.freedesktop.org/systemd/systemd/commit/?id=113b3fc1a8061f4a24dd0db74e9a3cd0083b2251
-    /usr/bin/mkdir -p ${TARGET_DIR}/@/var/lib
     /usr/bin/btrfs subvolume create ${TARGET_DIR}/@/var/lib/machines
     # default location for portable service images
     # The /var/lib/portables subvolume is created automatically by systemd.
