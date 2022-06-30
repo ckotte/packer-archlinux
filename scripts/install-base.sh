@@ -62,7 +62,7 @@ echo ">>>> install-base.sh: Generating the filesystem table.."
 echo ">>>> install-base.sh: Generating the system configuration script.."
 /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${CONFIG_SCRIPT}"
 
-CONFIG_SCRIPT_SHORT=`basename "$CONFIG_SCRIPT"`
+CONFIG_SCRIPT_SHORT=$(basename "$CONFIG_SCRIPT")
 cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
   echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring hostname, timezone, and keymap.."
   echo '${FQDN}' > /etc/hostname
