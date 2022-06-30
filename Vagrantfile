@@ -18,6 +18,8 @@ Vagrant.configure('2') do |config|
 
     no2.vm.provider 'libvirt' do |libvirt|
       libvirt.loader = '/usr/share/edk2-ovmf/x64/OVMF.fd'
+      # Create a virtio channel for use by the qemu-guest agent
+      libvirt.channel :type => 'unix', :target_name => 'org.qemu.guest_agent.0', :target_type => 'virtio'
     end
 
     no2.vm.synced_folder '.', '/vagrant', type: 'nfs', nfs_udp: false
