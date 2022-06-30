@@ -1,5 +1,4 @@
 output*
-packer_cache
 packer.log
 .vagrant
 temp
