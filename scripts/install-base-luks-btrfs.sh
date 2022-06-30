@@ -276,7 +276,7 @@ case "$BTRFS_LAYOUT" in
       echo ">>>> install-base.sh: Installing base-devel group.."
       /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm base-devel
       /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
-      GRUB_BUILD_SCRIPT_SHORT=`basename "$GRUB_BUILD_SCRIPT"`
+      GRUB_BUILD_SCRIPT_SHORT=$(basename "$GRUB_BUILD_SCRIPT")
       cat <<-EOF > "${TARGET_DIR}${GRUB_BUILD_SCRIPT}"
 echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Downloading grub bootloader.."
 # Need to create build directory, because it didn't work with /tmp and arch-chroot
@@ -415,7 +415,7 @@ fi
 echo ">>>> install-base.sh: Generating the system configuration script.."
 /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${CONFIG_SCRIPT}"
 
-CONFIG_SCRIPT_SHORT=`basename "$CONFIG_SCRIPT"`
+CONFIG_SCRIPT_SHORT=$(basename "$CONFIG_SCRIPT")
 cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring hostname, timezone, and keymap.."
 echo '${FQDN}' > /etc/hostname
