@@ -176,6 +176,24 @@ With wrapacker:
 
 > This will create the file in packer_arch_luks_grub_enhanced_virtualbox-<DATE>.box output.
 
+### Vagrant Machines
+
+There are two Vagrant machines defined in the Vagrantfile:
+
+|Provider|Vagrant Machine|
+|---|---|
+|Virtualbox|test-virtualbox
+|libvirt|test-libvirt|
+
+The box can be tested with:
+
+~~~~
+vagrant box add packer-arch output/packer_arch_luks_grub_enhanced_libvirt-2022.06.01.box --force
+~~~~
+~~~~
+vagrant up test-libvirt
+~~~~
+
 Known Issues
 ------------
 
