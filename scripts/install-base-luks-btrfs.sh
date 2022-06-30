@@ -281,7 +281,7 @@ case "$BTRFS_LAYOUT" in
 echo ">>>> ${GRUB_BUILD_SCRIPT_SHORT}: Downloading grub bootloader.."
 # Need to create build directory, because it didn't work with /tmp and arch-chroot
 mkdir /build
-chown nobody.nobody /build
+chown nobody:nobody /build
 cd /build
 sudo -u nobody curl -L -O https://aur.archlinux.org/cgit/aur.git/snapshot/grub-luks-keyfile.tar.gz
 sudo -u nobody tar -xvzf grub-luks-keyfile.tar.gz
