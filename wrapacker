@@ -33,7 +33,7 @@ VALID_BTRFS_LAYOUTS=(simple enhanced opensuse)
 warn() {
   local fmt="$1"
   shift
-  printf "wrapacker: $fmt\n" "$@" >&2
+  printf "wrapacker: %s\n" "$fmt" "$@" >&2
 }
 
 # print a message to stderr and exit with either
