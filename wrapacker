@@ -323,7 +323,7 @@ case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
 esac
 
 if validate_country "$country"; then
-  MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
+  MIRRORLIST="https://archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
   MIRROR=$(curl -s "$MIRRORLIST" | awk '/#Server/{ print $3; exit }' | sed 's|/$repo.*||')
 else
   warn 'INVALID COUNTRY SPECIFIED - %s' "$country"

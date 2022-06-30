@@ -34,7 +34,7 @@ GRUB_BUILD_SCRIPT='/usr/local/bin/build-grub.sh'
 TARGET_DIR='/mnt/btrfs'
 DATA_TARGET_DIR='/mnt/btrfs-data'
 COUNTRY=${COUNTRY:-US}
-MIRRORLIST="https://www.archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
+MIRRORLIST="https://archlinux.org/mirrorlist/?country=${COUNTRY}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
 
 # cleanup (only important if this script fails and if execution is retried)
 /usr/bin/umount -R ${TARGET_DIR} > /dev/null 2>&1 || /bin/true
