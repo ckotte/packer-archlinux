@@ -126,21 +126,20 @@ With wrapacker:
 ### Btrfs layouts
 
 The box can be built with different Btrfs layouts:
-* current: My current (messed up) layout. One subvolume with nested subvolumes. Note: Not recommended!
 * simple: Only one subvolume.
-* enhanced: Several subvolumes.
+* enhanced: Several subvolumes (current layout).
 * opensuse: openSUSE layout. Note: Cannot be booted because openSUSE-patched version of grub is needed.
 
 With packer:
 
 ~~~~
-packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=current" -on-error=ask -force arch-template-luks-btrfs.json
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=enhanced" -on-error=ask -force arch-template-luks-btrfs.json
 ~~~~
 
 With wrapacker:
 
 ~~~~
-./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --btrfs-layout=enhanced --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~
 
 ### Grub
@@ -150,13 +149,13 @@ You need to enter a password ("vagrant") with grub every time the VM boots to un
 With packer:
 
 ~~~~
-packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=current" -var "grub_passphrase=no" -on-error=ask -force arch-template-luks-btrfs.json
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=enhanced" -var "grub_passphrase=no" -on-error=ask -force arch-template-luks-btrfs.json
 ~~~~
 
 With wrapacker:
 
 ~~~~
-./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --btrfs-layout=current --on-error=ask --force arch-template-luks-btrfs.json
+./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --btrfs-layout=enhanced --on-error=ask --force arch-template-luks-btrfs.json
 ~~~~
 
 ### Installation Type
