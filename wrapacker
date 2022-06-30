@@ -187,7 +187,7 @@ EOF
 
 # check for dependencies
 for cmd in {awk,curl,sed,tr}; do
-  command -v $cmd > /dev/null || die "required command \"$cmd\" was not found"
+  command -v "$cmd" > /dev/null || die "required command \"$cmd\" was not found"
 done
 
 # specify default values / reset all variables that might be set
@@ -439,7 +439,7 @@ cat <<-EOF
     -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
     -force \\
-    $template
+    "$template"
 EOF
   else
 cat <<-EOF
@@ -456,7 +456,7 @@ cat <<-EOF
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
-    $template
+    "$template"
 EOF
   fi
 else
@@ -475,7 +475,7 @@ else
       -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
       -force \
-      $template
+      "$template"
   else
     $PACKER_BIN build \
       -only=$PACKER_PROVIDER \
@@ -490,7 +490,7 @@ else
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
-      $template
+      "$template"
   fi
 fi
 

@@ -170,7 +170,7 @@ case "$BTRFS_LAYOUT" in
 </snapshot>
 EOF
     echo ">>>> install-base.sh: Setting 'first root filesystem' snapshot as the default snapshot.."
-    /usr/bin/btrfs subvolume set-default $(/usr/bin/btrfs subvolume list ${TARGET_DIR} | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') ${TARGET_DIR}
+    /usr/bin/btrfs subvolume set-default "$(/usr/bin/btrfs subvolume list ${TARGET_DIR} | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" ${TARGET_DIR}
     ;;
   *)
     echo ">>>> install-base.sh: Btrfs layout option not supported. Aborting script.."
