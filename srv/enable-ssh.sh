@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PASSWORD=$(/usr/bin/openssl passwd -crypt 'vagrant')
+PASSWORD=$(/usr/bin/openssl passwd -6 'vagrant')
 
 # Vagrant-specific configuration
 /usr/bin/useradd --password "${PASSWORD}" --comment 'Vagrant User' --create-home --user-group vagrant
