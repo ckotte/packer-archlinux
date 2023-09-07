@@ -310,10 +310,7 @@ EOF
     ;;
 esac
 echo ">>>> install-base.sh: Installing basic packages.."
-# Need to install netctl as well: https://github.com/archlinux/arch-boxes/issues/70
-# Can be removed when Vagrant's Arch plugin will use systemd-networkd: https://github.com/hashicorp/vagrant/pull/11400
-# Probably included in Vagrant 2.3.0?
-/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm efibootmgr btrfs-progs dhcpcd netctl sudo vim
+/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm efibootmgr btrfs-progs sudo vim
 /usr/bin/arch-chroot ${TARGET_DIR} ln -sf /usr/bin/vim /usr/bin/vi
 /usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm openssh
 
@@ -448,7 +445,15 @@ echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring network.."
 # Disable systemd Predictable Network Interface Names and revert to traditional interface names
 # https://wiki.archlinux.org/index.php/Network_configuration#Revert_to_traditional_interface_names
 /usr/bin/ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
-/usr/bin/systemctl enable dhcpcd@eth0.service
+echo '[Match]' > /etc/systemd/network/20-wired.network
+echo 'Name=eth0' >> /etc/systemd/network/20-wired.network
+echo '' >> /etc/systemd/network/20-wired.network
+echo '[Network]' >> /etc/systemd/network/20-wired.network
+echo 'DHCP=yes' >> /etc/systemd/network/20-wired.network
+echo 'UseDNS=yes' >> /etc/systemd/network/20-wired.network
+/usr/bin/systemctl enable systemd-networkd.service
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+/usr/bin/systemctl enable systemd-resolved.service
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sshd.."
 /usr/bin/sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
 /usr/bin/systemctl enable sshd.service
