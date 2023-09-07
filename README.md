@@ -122,6 +122,16 @@ For debugging purposes, execute:
 
 See the `--help` flag for additional details.
 
+Used (default) wrapacker options:
+
+~~~~
+./wrapacker --country=DE --provider=virtualbox --write-zeros=no --luks=yes --grub-passphrase=no --btrfs-layout=enhanced --on-error=ask --force arch-template-luks-btrfs.json
+~~~~
+
+~~~~
+./wrapacker --country=DE --provider=libvirt --write-zeros=no --luks=yes --grub-passphrase=no --btrfs-layout=enhanced --on-error=ask --force arch-template-luks-btrfs.json
+~~~~
+
 ### LUKS encryption
 
 The box can be built with or without disk encryption via LUKS. Note: A LUKS1 header is used because grub cannot decrypt LUKS2 headers yet.
