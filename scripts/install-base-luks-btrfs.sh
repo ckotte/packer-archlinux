@@ -487,4 +487,8 @@ if [[ $LUKS_ENCRYPTION == "yes" ]] && [[ ${GRUB_PASSPHRASE} == "yes" ]]; then
 else
   echo ">>>> install-base.sh: Basic installation complete. Continueing with $PACKER_BUILDER_TYPE configuration.."
 fi
+# Turning network interfaces down to make sure SSH session was dropped on host.
+# More info at: https://www.packer.io/docs/provisioners/shell.html#handling-reboots
+echo '>>>> Turning down network interfaces and rebooting..'
+for i in $(/usr/bin/ip -o link show | /usr/bin/awk -F': ' '{print $2}'); do /usr/bin/ip link set "${i}" down; done
 /usr/bin/systemctl reboot
