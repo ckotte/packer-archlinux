@@ -7,6 +7,8 @@ with the default VirtualBox provider as well as with
 [VMware](https://www.vagrantup.com/vmware), [Parallels](https://github.com/Parallels/vagrant-parallels)
 and [libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) providers.
 
+This repo is a fork of [packer-arch](https://github.com/elasticdog/packer-arch).
+
 <!-- TOC -->
 - [Overview](#overview)
 - [Usage](#usage)
