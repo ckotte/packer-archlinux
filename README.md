@@ -183,17 +183,17 @@ With wrapacker:
 
 You can control the name of the box file. This is useful if you test different configuration options, but don't want to overwrite previously built boxes.
 
+`install_type=<any string>`
+
 With packer:
 
 ~~~~
-packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=enhanced" -var "luks_encryption=yes" -var "grub_passphrase=no" -on-error=ask -force arch-template-luks-btrfs.json
+packer build -only=virtualbox-iso -var "ssh_timeout=20m" -var "country=DE" -var "write_zeros=false" -var "btrfs_layout=enhanced" -var "luks_encryption=yes" -var "grub_passphrase=no" -on-error=ask -var "install_type=test" -force arch-template-luks-btrfs.json
 ~~~~
 
 With wrapacker:
 
-~~~~
-./wrapacker --country=DE --provider=virtualbox --skip-write-zeros --grub-passphrase=no --luks=yes --btrfs-layout=enhanced --on-error=ask --force arch-template-luks-btrfs.json
-~~~~
+The install_type variable will be created automatically based on the values specified for LUKS encryption, GRUB passphrase, and Btrfs layout.
 
 > This will create the file in packer_arch_luks_grub_enhanced_virtualbox-<DATE>.box output.
 
