@@ -126,6 +126,8 @@ See the `--help` flag for additional details.
 
 The box can be built with or without disk encryption via LUKS. Note: A LUKS1 header is used because grub cannot decrypt LUKS2 headers yet.
 
+`luks_encryption=yes|no`
+
 With packer:
 
 ~~~~
@@ -145,6 +147,8 @@ The box can be built with different Btrfs layouts:
 * enhanced: Several subvolumes (current layout).
 * opensuse: openSUSE layout. Note: Cannot be booted because openSUSE-patched version of grub is needed.
 
+`btrfs_layout=simple|enhanced|opensuse`
+
 With packer:
 
 ~~~~
@@ -160,6 +164,8 @@ With wrapacker:
 ### Grub
 
 You need to enter a password ("vagrant") with grub every time the VM boots to unlock /boot if LUKS is used. It's possible to use grub-luks-keyfile and the keyfile to automatically unlock /boot in this case. Note: This is only for testing. This shouldn't be done outside a (Vagrant) Virtual Machine.
+
+`grub_passphrase=yes|no`
 
 With packer:
 
