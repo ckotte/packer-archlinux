@@ -1,5 +1,4 @@
-Packer Archlinux
-================
+# Packer Archlinux
 
 Packer Archlinux is a [Packer](https://www.packer.io/) template and
 installation script that can be used to generate a [Vagrant](https://www.vagrantup.com/)
@@ -8,8 +7,23 @@ with the default VirtualBox provider as well as with
 [VMware](https://www.vagrantup.com/vmware), [Parallels](https://github.com/Parallels/vagrant-parallels)
 and [libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) providers.
 
-Overview
---------
+<!-- TOC -->
+- [Overview](#overview)
+- [Usage](#usage)
+    - [VirtualBox Provider](#virtualbox-provider)
+    - [VMware Provider](#vmware-provider)
+    - [Parallels Provider](#parallels-provider)
+    - [libvirt Provider](#libvirt-provider)
+    - [wrapacker](#wrapacker)
+    - [LUKS encryption](#luks-encryption)
+    - [Btrfs layouts](#btrfs-layouts)
+    - [Grub](#grub)
+    - [Installation Type](#installation-type)
+    - [Vagrant Machines](#vagrant-machines)
+    - [Vagrant Provisioners](#vagrant-provisioners)
+<!-- /TOC -->
+
+## Overview
 
 My goal is to duplicate the configuration of my Arch Linux laptop:
 
@@ -25,8 +39,7 @@ pretty closely, with a few tweaks to ensure functionality within a VM. Beyond
 that, the only customizations to the machine are related to the vagrant user
 and the steps recommended for any base box.
 
-Usage
------
+## Usage
 
 ### VirtualBox Provider
 
