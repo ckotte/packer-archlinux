@@ -359,7 +359,7 @@ case $write_zeros in
     ;;
 esac
 
-if [[ " ${VALID_BTRFS_LAYOUTS[@]} " =~ " ${btrfs_layout} " ]]; then
+if [[ " ${VALID_BTRFS_LAYOUTS[*]} " =~ ${btrfs_layout} ]]; then
   BTRFS_LAYOUT=${btrfs_layout}
 else
   warn "unknown btrfs layout -- ${btrfs_layout}"
