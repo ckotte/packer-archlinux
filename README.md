@@ -4,8 +4,8 @@ Packer Archlinux is a [Packer](https://www.packer.io/) template and
 installation script that can be used to generate a [Vagrant](https://www.vagrantup.com/)
 base box for [Arch Linux](https://www.archlinux.org/). The template works
 with the default VirtualBox provider as well as with
-[VMware](https://www.vagrantup.com/vmware), [Parallels](https://github.com/Parallels/vagrant-parallels)
-and [libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) providers.
+[VMware](https://www.vagrantup.com/vmware) and
+[libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) providers.
 
 This repo is a fork of [packer-arch](https://github.com/elasticdog/packer-arch).
 
@@ -14,7 +14,6 @@ This repo is a fork of [packer-arch](https://github.com/elasticdog/packer-arch).
 - [Usage](#usage)
     - [VirtualBox Provider](#virtualbox-provider)
     - [VMware Provider](#vmware-provider)
-    - [Parallels Provider](#parallels-provider)
     - [libvirt Provider](#libvirt-provider)
     - [wrapacker](#wrapacker)
     - [LUKS encryption](#luks-encryption)
@@ -72,21 +71,6 @@ this repo and go:
 Then you can import the generated box into Vagrant:
 
     $ vagrant box add arch output/packer_arch_vmware.box
-
-### Parallels Provider
-
-Assuming that you already have Packer,
-[Parallels](http://www.parallels.com/), [Parallels SDK](http://www.parallels.com/eu/products/desktop/download/) and
-Vagrant with the Parallels provider installed, you should be good to clone
-this repo and go:
-
-    $ git clone https://github.com/ckotte/packer-archlinux.git
-    $ cd packer-archlinux/
-    $ packer build -only=parallels-iso arch-template-luks-btrfs.json
-
-Then you can import the generated box into Vagrant:
-
-    $ vagrant box add arch output/packer_arch_parallels.box
 
 ### libvirt Provider
 

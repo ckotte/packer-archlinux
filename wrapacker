@@ -80,7 +80,7 @@ print_valid_countries() {
 # print the list of valid providers to stderr
 print_valid_providers() {
   printf '\n*** VALID PROVIDERS ***\n\n' >&2
-  for provider in {parallels,virtualbox,vmware,libvirt}; do
+  for provider in {virtualbox,vmware,libvirt}; do
     printf '%-6s\n' "$provider"
   done | column >&2
 }
@@ -302,9 +302,6 @@ done
 
 
 case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
-  parallels | parallels-iso)
-    PACKER_PROVIDER='parallels-iso'
-    ;;
   virtualbox | virtualbox-iso)
     PACKER_PROVIDER='virtualbox-iso'
     ;;
