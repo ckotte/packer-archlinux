@@ -434,7 +434,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
-    -var "luks=$LUKS" \\
+    -var "luks_encryption=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
@@ -452,7 +452,7 @@ cat <<-EOF
     -var "headless=$headless" \\
     -var "write_zeros=$WRITE_ZEROS" \\
     -var "btrfs_layout=$BTRFS_LAYOUT" \\
-    -var "luks=$LUKS" \\
+    -var "luks_encryption=$LUKS" \\
     -var "grub_passphrase=$GRUB_PASSPHRASE" \\
     -var "install_type=$install_type" \\
     -on-error=$ON_ERROR \\
@@ -470,7 +470,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
-      -var "luks=$LUKS" \
+      -var "luks_encryption=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
@@ -486,7 +486,7 @@ else
       -var "headless=$headless" \
       -var "write_zeros=$WRITE_ZEROS" \
       -var "btrfs_layout=$BTRFS_LAYOUT" \
-      -var "luks=$LUKS" \
+      -var "luks_encryption=$LUKS" \
       -var "grub_passphrase=$GRUB_PASSPHRASE" \
       -var "install_type=$install_type" \
       -on-error=$ON_ERROR \
