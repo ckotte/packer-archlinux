@@ -433,11 +433,6 @@ if [[ $LUKS_ENCRYPTION == "yes" ]] && [[ ${GRUB_PASSPHRASE} == "no" ]]; then
     --config=/tmp/load.cfg btrfs cryptodisk luks gcry_rijndael gcry_rijndael gcry_sha256 part_gpt fat normal configfile
 fi
 /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
-# additinal step is necessary if VirtualBox is used
-# add grub to EFI shell autostart:
-# - Grub boot doesn't work anymore after the VM got exported by packer
-# - The system just boots in the EFI shell on a new system deployed via Vagrant (probably because the EFI information doesn't get exported!?)
-echo '\EFI\arch\grubx64.efi' > /boot/efi/startup.nsh
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Setting root pasword.."
 /usr/bin/usermod --password "${PASSWORD}" root
 echo -e 'root\nroot' | /usr/bin/passwd root

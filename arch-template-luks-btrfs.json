@@ -119,7 +119,7 @@
         {
             "only": ["virtualbox-iso"],
             "type": "shell",
-            "execute_command": "{{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+            "execute_command": "{{ .Vars }} LUKS_ENCRYPTION={{ user `luks_encryption` }} GRUB_PASSPHRASE={{ user `grub_passphrase` }} sudo -E -S bash '{{ .Path }}'",
             "script": "scripts/install-virtualbox.sh"
         },
         {
