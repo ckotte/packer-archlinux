@@ -447,7 +447,6 @@ echo '[Network]' >> /etc/systemd/network/20-wired.network
 echo 'DHCP=yes' >> /etc/systemd/network/20-wired.network
 echo 'UseDNS=yes' >> /etc/systemd/network/20-wired.network
 /usr/bin/systemctl enable systemd-networkd.service
-ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 /usr/bin/systemctl enable systemd-resolved.service
 echo ">>>> ${CONFIG_SCRIPT_SHORT}: Configuring sshd.."
 /usr/bin/sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
@@ -472,6 +471,11 @@ EOF
 echo ">>>> install-base.sh: Entering chroot and configuring system.."
 /usr/bin/arch-chroot ${TARGET_DIR} ${CONFIG_SCRIPT}
 rm "${TARGET_DIR}${CONFIG_SCRIPT}"
+echo ">>>> install-base.sh: Creating pending /etc/resolv.conf symlink outside arch-chroot.."
+# Creating the /etc/resolv.conf symlink isn't possible while inside arch-chroot, since the file is bind-mounted from the outside system.
+# The symlink needs to be created from outside the chroot.
+# https://wiki.archlinux.org/title/systemd-resolved#DNS
+ln -sf /run/systemd/resolve/stub-resolv.conf ${TARGET_DIR}/etc/resolv.conf
 
 echo ">>>> install-base.sh: Completing installation.."
 /usr/bin/sleep 3
