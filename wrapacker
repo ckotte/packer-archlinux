@@ -3,9 +3,7 @@
 #
 # wrapacker
 #
-# A script to automatically ensure the latest ISO download URL and optionally
-# use a mirror from the provided country in order to build an Arch Linux box
-# using Packer.
+# A script to build an Arch Linux box using Packer.
 #
 # Copyright (c) 2015-2018 Aaron Bull Schaefer <aaron@elasticdog.com>
 # Copyright (c) 2020 Christian Kotte <christian.kotte@gmx.de>
@@ -114,16 +112,14 @@ help() {
   cat <<-EOF
 
 NAME
-    wrapacker -- wrap packer to build arch with custom mirror settings
+    wrapacker -- wrap packer to build arch
 
 SYNOPSIS
     wrapacker [options...] [template]
 
 DESCRIPTION
 
-    wrapacker will automatically ensure the latest ISO download URL and
-    will optionally use a mirror from the provided country in order to
-    build an Arch Linux box using Packer.
+    wrapacker will automatically build an Arch Linux box using Packer.
 
 OPTIONS
     -c, --country=COUNTRY
@@ -172,8 +168,8 @@ OPTIONS
         only works with --provider=virtualbox
 
 TEMPLATE
-    Name of the packer json template to use
-    defaults to arch-template.json
+    Name of the packer template to use
+    defaults to arch-template.pkr.hcl
 
 AUTHOR
     Aaron Bull Schaefer <aaron@elasticdog.com>
@@ -191,9 +187,8 @@ for cmd in {awk,curl,sed,tr}; do
 done
 
 # specify default values / reset all variables that might be set
-MIRROR='https://mirrors.kernel.org/archlinux'
 country='US'
-provider='virtualbox-iso'
+provider='virtualbox-iso.x86_64'
 dry_run=false
 timeout='20m'
 write_zeros='no'
@@ -204,7 +199,7 @@ install_type=''
 on_error='cleanup'
 force=false
 headless=false
-template='arch-template.json'
+template='arch-template.pkr.hcl'
 
 # parse command line options
 while [[ $1 != '' ]]; do
@@ -288,7 +283,7 @@ while [[ $1 != '' ]]; do
       usage
       exit 1
       ;;
-    *.json)
+    *.pkr.hcl)
       template=$1
       ;;
     *)
@@ -303,13 +298,13 @@ done
 
 case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
   virtualbox | virtualbox-iso)
-    PACKER_PROVIDER='virtualbox-iso'
+    PACKER_PROVIDER='virtualbox-iso.x86_64'
     ;;
   vmware | vmware-iso)
-    PACKER_PROVIDER='vmware-iso'
+    PACKER_PROVIDER='vmware-iso.x86_64'
     ;;
   libvirt | qemu)
-    PACKER_PROVIDER='qemu'
+    PACKER_PROVIDER='qemu.x86_64'
     ;;
   *)
     warn "unknown provider -- ${provider}"
@@ -318,20 +313,6 @@ case $(echo "$provider" | tr '[:upper:]' '[:lower:]') in
     exit 1
     ;;
 esac
-
-if validate_country "$country"; then
-  MIRRORLIST="https://archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on"
-  MIRROR=$(curl -s "$MIRRORLIST" | awk '/#Server/{ print $3; exit }' | sed "s|/\$repo.*||")
-else
-  warn 'INVALID COUNTRY SPECIFIED - %s' "$country"
-  usage
-  print_valid_countries
-  exit 1
-fi
-
-ISO_CHECKSUM_URL="${MIRROR}/iso/latest/sha256sums.txt"
-ISO_NAME=$(curl -sL "$ISO_CHECKSUM_URL" | awk '/archlinux-x86_64.iso/{ print $2 }')
-ISO_URL="${MIRROR}/iso/latest/${ISO_NAME}"
 
 if [[ "$timeout" =~ ^[0-9]+(ns|us|ms|s|m|h)$ ]]; then
   SSH_TIMEOUT=$timeout
@@ -424,8 +405,6 @@ if [[ $dry_run = true ]]; then
 cat <<-EOF
   $PACKER_BIN build \\
     -only=$PACKER_PROVIDER \\
-    -var "iso_url=$ISO_URL" \\
-    -var "iso_checksum_url=$ISO_CHECKSUM_URL" \\
     -var "ssh_timeout=$SSH_TIMEOUT" \\
     -var "country=$country" \\
     -var "headless=$headless" \\
@@ -442,8 +421,6 @@ EOF
 cat <<-EOF
   $PACKER_BIN build \\
     -only=$PACKER_PROVIDER \\
-    -var "iso_url=$ISO_URL" \\
-    -var "iso_checksum_url=$ISO_CHECKSUM_URL" \\
     -var "ssh_timeout=$SSH_TIMEOUT" \\
     -var "country=$country" \\
     -var "headless=$headless" \\
@@ -460,8 +437,6 @@ else
   if [[ $force = true ]]; then
     $PACKER_BIN build \
       -only=$PACKER_PROVIDER \
-      -var "iso_url=$ISO_URL" \
-      -var "iso_checksum_url=$ISO_CHECKSUM_URL" \
       -var "ssh_timeout=$SSH_TIMEOUT" \
       -var "country=$country" \
       -var "headless=$headless" \
@@ -476,8 +451,6 @@ else
   else
     $PACKER_BIN build \
       -only=$PACKER_PROVIDER \
-      -var "iso_url=$ISO_URL" \
-      -var "iso_checksum_url=$ISO_CHECKSUM_URL" \
       -var "ssh_timeout=$SSH_TIMEOUT" \
       -var "country=$country" \
       -var "headless=$headless" \

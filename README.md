@@ -12,6 +12,7 @@ This repo is a fork of [packer-arch](https://github.com/elasticdog/packer-arch).
 <!-- TOC -->
 - [Overview](#overview)
 - [Usage](#usage)
+    - [Plugins](#plugins)
     - [VirtualBox Provider](#virtualbox-provider)
     - [VMware Provider](#vmware-provider)
     - [libvirt Provider](#libvirt-provider)
@@ -41,6 +42,14 @@ that, the only customizations to the machine are related to the vagrant user
 and the steps recommended for any base box.
 
 ## Usage
+
+### Plugins
+
+Install required external plugins:
+
+~~~~
+packer init arch-template-luks-btrfs.pkr.hcl
+~~~~
 
 ### VirtualBox Provider
 
